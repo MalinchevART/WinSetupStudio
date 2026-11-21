@@ -12,7 +12,7 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
-$base = 'https://raw.githubusercontent.com/nmalinchev-nlm/WinSetupStudio/main'
+$base = 'https://raw.githubusercontent.com/MalinchevART/WinSetupStudio/main'
 $dir = Join-Path $env:TEMP 'WinSetupStudio'
 New-Item -ItemType Directory -Path $dir -Force | Out-Null
 

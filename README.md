@@ -9,7 +9,7 @@
 Отвори PowerShell и постави:
 
 ```powershell
-irm https://raw.githubusercontent.com/nmalinchev-nlm/WinSetupStudio/main/bootstrap.ps1 | iex
+irm https://raw.githubusercontent.com/MalinchevART/WinSetupStudio/main/bootstrap.ps1 | iex
 ```
 
 Сваля файловете във временна папка, стартира helper-а и отваря приложението.
