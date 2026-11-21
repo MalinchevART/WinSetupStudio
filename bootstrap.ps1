@@ -1,7 +1,7 @@
 ﻿# ============================================================
 #  WinSetup Studio - bootstrap.ps1
 #  Едноредов стартер от интернет (спартански вариант):
-#    irm https://raw.githubusercontent.com/nmalinchev-nlm/WinSetupStudio/main/bootstrap.ps1 | iex
+#    irm https://raw.githubusercontent.com/MalinchevART/WinSetupStudio/main/bootstrap.ps1 | iex
 #  Сваля файловете в %TEMP%\WinSetupStudio, стартира helper-а и
 #  отваря приложението. За ПЪЛНИ права (админ) използвай пълния
 #  пакет (WinSetupStudio-Portable.exe / WinSetupStudio.bat).
