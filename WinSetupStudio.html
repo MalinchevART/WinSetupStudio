@@ -699,7 +699,7 @@ if (-not $NoApp) {
         Get-ChildItem $PSScriptRoot -Filter '*profile*.json' -ErrorAction SilentlyContinue |
             Copy-Item -Destination $toolDir -Force -ErrorAction SilentlyContinue
         Write-Host '  Инструментът е на флашката: ' "$toolDir" -ForegroundColor Green
-        Write-Host '  (Отваряте го от всяка машина: двойный клик върху WinSetupStudio.html)' -ForegroundColor DarkGray
+        Write-Host '  (Отваряте го от всяка машина: двоен клик върху WinSetupStudio.html)' -ForegroundColor DarkGray
     } else {
         Write-Host '  WHATIF: копиране на WinSetupStudio.html/.cmd/.ps1 + README в \WinSetupStudio\'
     }
