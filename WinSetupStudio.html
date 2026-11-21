@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="bg" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WinSetup Studio 1.1 — генератор на autounattend.xml</title>
+<style>
+:root{
+  --bg:#f4f6f9; --card:#ffffff; --ink:#1d2430; --mut:#5c6675; --line:#dde3ec;
+  --hdr-grad:linear-gradient(135deg,#16203a 0%,#1e2f52 100%); --hdr-ink:#f0f5ff; --hdr-sub:#9fb0cc; --hdr-btn:#2b3a56; --hdr-btn-bd:#3d5077; --hdr-btn-h:#38496e;
+  --tool-bg:#e9edf4; --nav-hover:#e7ecf4; --nav-active:#dce7fb;
+  --input-bg:#ffffff; --shadow:0 1px 3px rgba(20,30,50,.07); --shadow-h:0 4px 14px rgba(20,30,50,.12);
+  --blue:#2563c4; --blue-h:#1e54ad;
+  --green:#146c2e; --green-bg:#eaf6ee; --green-bd:#bfe3cb;
+  --amber:#a85d00; --amber-bg:#fdf3e7; --amber-bd:#f3d1a5;
+  --red:#d23c3c; --red-bg:#fdeaea; --red-bd:#f0b5b5; --red-ink:#7d1d1d;
+  --warn-ink:#7c4a00; --ok-ink:#155a2c;
+  --xml-bg:#101722; --xml-ink:#c8d6ee;
+}
+html[data-theme="dark"]{
+  --bg:#111620; --card:#1a2230; --ink:#dbe2ee; --mut:#8a97ab; --line:#2a3446;
+  --hdr-grad:linear-gradient(135deg,#0b111e 0%,#14203a 100%); --hdr-ink:#e8eefb; --hdr-sub:#7f92b3; --hdr-btn:#1c2942; --hdr-btn-bd:#2f4066; --hdr-btn-h:#263656;
+  --tool-bg:#171e2c; --nav-hover:#212b3f; --nav-active:#26345a;
+  --input-bg:#0f1521; --shadow:0 1px 4px rgba(0,0,0,.45); --shadow-h:0 4px 18px rgba(0,0,0,.55);
+  --blue:#5b8ff7; --blue-h:#4a7ce0;
+  --green:#43c878; --green-bg:#16301f; --green-bd:#2a573b;
+  --amber:#f0a12c; --amber-bg:#2e2413; --amber-bd:#5f4c1d;
+  --red:#ef5350; --red-bg:#2f1717; --red-bd:#5f2c2c; --red-ink:#ff9e9c;
+  --warn-ink:#ffd089; --ok-ink:#8fe0ae;
+  --xml-bg:#0b1018; --xml-ink:#b9c9e6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font:14px/1.55 "Segoe UI Variable","Segoe UI",system-ui,Arial,sans-serif;background:var(--bg);color:var(--ink);transition:background .2s,color .2s}
+button{font:inherit;cursor:pointer}
+a{color:var(--blue)}
+
+/* ---------- header ---------- */
+header{background:var(--hdr-grad);color:var(--hdr-ink);padding:12px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header .logo{font-size:19px;font-weight:700;letter-spacing:.3px;display:flex;align-items:center;gap:9px}
+header .ver{font-size:10px;font-weight:600;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:1px 8px;color:var(--hdr-sub)}
+header .sub{color:var(--hdr-sub);font-size:12px;flex:1;min-width:220px}
+header .btn{background:var(--hdr-btn);color:#dbe6fa;border:1px solid var(--hdr-btn-bd);border-radius:8px;padding:7px 13px;transition:.15s}
+header .btn:hover{background:var(--hdr-btn-h);transform:translateY(-1px)}
+header .btn.primary{background:linear-gradient(135deg,#2f9d53,#37b561);border-color:#3c9a58;color:#fff;font-weight:700;box-shadow:0 2px 10px rgba(55,181,97,.35)}
+header .btn.primary:hover{transform:translateY(-1px)}
+#pwrap{height:3px;background:rgba(255,255,255,.08)}
+#pbar{height:100%;width:0;background:linear-gradient(90deg,#37b561,#5b8ff7);transition:width .3s}
+
+/* ---------- toolbar ---------- */
+#toolbar{display:flex;align-items:center;gap:10px;padding:9px 18px;background:var(--tool-bg);border-bottom:1px solid var(--line);flex-wrap:wrap}
+#toolbar .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+#toolbar .seg button{border:0;background:transparent;padding:6px 15px;color:var(--mut)}
+#toolbar .seg button.on{background:var(--blue);color:#fff;font-weight:600}
+#q{flex:1;min-width:180px;max-width:420px;padding:7px 11px;border:1px solid var(--line);border-radius:8px;background:var(--input-bg);color:var(--ink)}
+#countInfo{color:var(--mut);font-size:12px}
+.mbtn{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:8px 15px;font-weight:600;transition:.15s}
+.mbtn:hover{background:var(--blue-h);transform:translateY(-1px)}
+.mbtn.sec{background:var(--card);color:var(--ink);border:1px solid var(--line);font-weight:normal}
+.mbtn.sec:hover{border-color:var(--blue);color:var(--blue)}
+#banner{padding:9px 18px;background:var(--amber-bg);border-bottom:1px solid var(--amber-bd);color:var(--warn-ink);font-size:13px}
+#banner b{color:var(--ink)}
+#banner button{background:none;border:none;color:var(--blue);text-decoration:underline;padding:0 2px;font-size:13px}
+body.dropping::after{content:"⬇ Пусни JSON профила тук";position:fixed;inset:0;background:rgba(37,99,196,.25);border:3px dashed var(--blue);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#fff;z-index:60}
+
+/* ---------- layout ---------- */
+#layout{display:grid;grid-template-columns:235px minmax(0,1fr) 410px;align-items:start}
+aside#sidebar{position:sticky;top:0;padding:12px;border-right:1px solid var(--line);height:100vh;overflow:auto}
+aside#sidebar .grp{display:flex;gap:8px;align-items:center;padding:8px 10px;border-radius:8px;color:var(--ink);text-decoration:none;cursor:pointer;border-left:3px solid transparent}
+aside#sidebar .grp:hover{background:var(--nav-hover)}
+aside#sidebar .grp.active{background:var(--nav-active);border-left-color:var(--blue);font-weight:600}
+aside#sidebar .grp .ic{width:20px;text-align:center}
+aside#sidebar .grp .cnt{margin-left:auto;font-size:11px;color:var(--mut);border-radius:9px;padding:1px 7px;min-width:20px;text-align:center}
+aside#sidebar .grp .cnt.act{color:#fff;background:var(--blue)}
+aside#sidebar .legend{margin-top:14px;border-top:1px solid var(--line);padding-top:10px;font-size:12px;color:var(--mut)}
+aside#sidebar .legend b{display:block;color:var(--ink);margin-bottom:4px}
+aside#sidebar .legend div{margin:3px 0}
+main#content{padding:16px;min-height:calc(100vh - 118px)}
+aside#right{position:sticky;top:0;border-left:1px solid var(--line);height:100vh;display:flex;flex-direction:column;background:var(--card)}
+#rtabs{display:flex;border-bottom:1px solid var(--line)}
+#rtabs button{flex:1;border:0;background:var(--tool-bg);padding:10px;color:var(--mut);border-right:1px solid var(--line)}
+#rtabs button.on{background:var(--card);color:var(--ink);font-weight:700;border-bottom:2px solid var(--blue)}
+#rbody{flex:1;overflow:auto;padding:13px}
+#xmlbox{white-space:pre-wrap;word-break:break-all;font:11.5px/1.5 Consolas,"Cascadia Mono",monospace;background:var(--xml-bg);color:var(--xml-ink);border-radius:10px;padding:12px;overflow:auto;max-height:calc(100vh - 215px)}
+#xmlbox .t{color:#7fb3ff}
+#xmlbox .a{color:#9fd6a0}
+#xmlbox .v{color:#f0c674}
+#xmlbox .c{color:#7c8798;font-style:italic}
+
+/* ---------- cards ---------- */
+.grouph{display:flex;align-items:center;gap:10px;margin:24px 0 8px;flex-wrap:wrap}
+.grouph:first-child{margin-top:2px}
+.grouph h2{font-size:17px;margin:0}
+.grouph .gdesc{color:var(--mut);font-size:12.5px}
+.badge{font-size:11px;color:var(--mut);background:var(--tool-bg);border:1px solid var(--line);border-radius:10px;padding:1px 9px}
+.card{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:10px;padding:11px 15px;margin:9px 0;box-shadow:var(--shadow);transition:box-shadow .15s,transform .15s}
+.card:hover{box-shadow:var(--shadow-h);transform:translateY(-1px)}
+.card.lv-amber{border-left-color:var(--amber)}
+.card.lv-red{border-left-color:var(--red);background:var(--red-bg)}
+.card .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.card .lbl{font-weight:600;flex:1;min-width:180px}
+.card.lv-red .lbl{color:var(--red-ink)}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--green)}
+.card.lv-amber .dot{background:var(--amber)}
+.card.lv-red .dot{background:var(--red)}
+.pill{font-size:10px;font-weight:700;letter-spacing:.5px;border-radius:10px;padding:2px 9px;margin-left:6px}
+.pill.p-green{color:var(--green);background:var(--green-bg);border:1px solid var(--green-bd)}
+.pill.p-amber{color:var(--amber);background:var(--amber-bg);border:1px solid var(--amber-bd)}
+.pill.p-red{color:var(--red-ink);background:var(--red-bg);border:1px solid var(--red-bd)}
+.card select,.card input[type=text],.card input[type=password],.card input[type=number]{
+  padding:7px 10px;border:1px solid var(--line);border-radius:8px;min-width:220px;background:var(--input-bg);color:var(--ink)}
+.card .sw{position:relative;width:42px;height:23px;flex:none}
+.card .sw input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+.card .sw i{position:absolute;inset:0;background:var(--mut);border-radius:12px;transition:.15s;pointer-events:none;opacity:.5}
+.card .sw i:before{content:"";position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.15s}
+.card .sw input:checked+i{background:var(--green);opacity:1}
+.card .sw input:checked+i:before{left:22px}
+.more{margin-top:8px}
+.more summary{cursor:pointer;color:var(--blue);font-size:12.5px;list-style:none}
+.more summary:before{content:"▸ "}
+.more[open] summary:before{content:"▾ "}
+.more .body{margin-top:6px;background:var(--tool-bg);border:1px solid var(--line);border-radius:8px;padding:9px 13px;font-size:12.5px}
+.more .body p{margin:4px 0}
+.more .body b{color:var(--ink)}
+.wbox{margin-top:8px;padding:8px 11px;border-radius:8px;font-size:12.5px}
+.wbox.red{background:var(--red-bg);border:1px solid var(--red-bd);color:var(--red-ink);font-weight:600}
+.wbox.amber{background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--warn-ink)}
+.note{background:var(--green-bg);border:1px solid var(--green-bd);border-radius:10px;padding:10px 14px;margin:9px 0;color:var(--ok-ink);font-size:12.5px}
+.hint{color:var(--mut);font-size:11.5px;margin-top:4px}
+.hint b{color:var(--ink)}
+/* акаунти и приложения */
+.accrow{border:1px solid var(--line);border-radius:10px;padding:10px 13px;margin:9px 0;background:var(--card)}
+.accrow .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.accrow label{font-size:11.5px;color:var(--mut);display:block;margin-bottom:3px}
+.accrow input{padding:6px 9px;border:1px solid var(--line);border-radius:7px;background:var(--input-bg);color:var(--ink)}
+.accrow .del{background:var(--red-bg);color:var(--red-ink);border:1px solid var(--red-bd);border-radius:7px;padding:5px 10px;margin-left:auto}
+.addacc{background:var(--card);color:var(--blue);border:1px dashed var(--blue);border-radius:8px;padding:8px 16px;width:100%}
+.appcat{margin:10px 0 4px;font-weight:700;font-size:13px;color:var(--blue)}
+.appitem{display:flex;align-items:center;gap:10px;padding:6px 10px;border:1px solid var(--line);border-left:3px solid var(--green);border-radius:8px;margin:5px 0;background:var(--card)}
+.appitem .lbl{flex:1;font-weight:600;font-size:13px}
+.appitem .wid{color:var(--mut);font-size:11px;font-family:Consolas,monospace}
+.appitem .hint{margin:0}
+
+/* ---------- modal ---------- */
+#modal{position:fixed;inset:0;background:rgba(8,12,20,.6);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:50}
+#modal.open{display:flex}
+#modal .box{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;max-width:680px;width:94%;max-height:88vh;overflow:auto;padding:22px 26px;box-shadow:var(--shadow-h)}
+#modal h3{margin:0 0 12px}
+#modal pre{background:var(--xml-bg);color:var(--xml-ink);padding:11px;border-radius:8px;font-size:12px;overflow:auto;white-space:pre-wrap}
+#modal .mfoot{margin-top:16px;display:flex;gap:10px;justify-content:flex-end}
+
+/* ---------- right panel misc ---------- */
+.iss{border-radius:8px;padding:9px 11px;margin:7px 0;font-size:12.5px}
+.iss.err{background:var(--red-bg);border:1px solid var(--red-bd);color:var(--red-ink)}
+.iss.warn{background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--warn-ink)}
+.iss.ok{background:var(--green-bg);border:1px solid var(--green-bd);color:var(--ok-ink)}
+.sumline{display:flex;gap:8px;font-size:12.5px;margin:4px 0}
+.sumline .k{color:var(--mut);min-width:130px}
+.rbtns{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+.rbtns button{border:0;border-radius:8px;padding:10px 15px}
+#genBtn{background:var(--blue);color:#fff;font-weight:700;flex:1}
+#genBtn:hover{background:var(--blue-h)}
+#genBtn:disabled{opacity:.45;cursor:not-allowed}
+#copyBtn,#profBtn{background:var(--tool-bg);color:var(--ink);border:1px solid var(--line)}
+.helpsec h4{margin:15px 0 5px}
+.helpsec p,.helpsec li{font-size:12.8px;color:var(--ink)}
+.helpsec pre{background:var(--xml-bg);color:var(--xml-ink);padding:9px;border-radius:8px;font-size:11.5px;white-space:pre-wrap}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#1d2430;color:#fff;padding:10px 20px;border-radius:22px;font-size:13px;opacity:0;transition:.25s;z-index:99;pointer-events:none;box-shadow:var(--shadow-h)}
+#toast.show{opacity:.96}
+.eye{background:var(--tool-bg);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:12px;color:var(--mut)}
+.eye:hover{color:var(--blue);border-color:var(--blue)}
+@media (max-width:1100px){
+  #layout{grid-template-columns:1fr}
+  aside#sidebar{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:4px;padding:8px 10px}
+  aside#sidebar .grp{border-left:0;padding:5px 9px}
+  aside#sidebar .legend{display:none}
+  aside#right{position:static;height:auto;border-left:0;border-top:1px solid var(--line)}
+  #xmlbox{max-height:420px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⚙️ WinSetup Studio <span class="ver">1.1.0</span><span id="apiBadge" class="ver" style="display:none"></span></div>
+  <div class="sub">Генератор на <b>autounattend.xml</b> — инсталирай Windows без въпроси, вече настроен. Работи изцяло офлайн; нищо не се изпраща никъде.</div>
+  <button class="btn primary" id="topGen">💾 Генерирай autounattend.xml</button>
+  <button class="btn" id="btnReadPC">🖥 Прочети този комп</button>
+  <button class="btn" id="btnIso">⬇ Свали Windows</button>
+  <button class="btn" id="btnUsb">🔌 Флашка</button>
+  <button class="btn" id="btnHelp">❓ Помощ</button>
+  <button class="btn" id="btnTheme" title="Тъмна/светла тема">☀️</button>
+</header>
+<div id="pwrap"><div id="pbar"></div></div>
+
+<div id="banner">💡 Спомняш ли си „там в главна директория“? Точно така: файлът <b>autounattend.xml</b> се слага в <b>ROOT (главната папка) на инсталационната флашка</b> — Windows Setup го открива и чете сам при стартиране. <button id="bannerMore">Как работи →</button></div>
+
+<div id="toolbar">
+  <div class="seg"><button id="vwBase" class="on">Базов изглед</button><button id="vwFull">Подробен изглед</button></div>
+  <input id="q" type="text" placeholder="🔍 Търси настройка… (напр. „парола“, „дялове“, „telemetry“)">
+  <span id="countInfo" style="color:var(--mut);font-size:12px"></span>
+  <span style="flex:1"></span>
+  <button class="mbtn sec" id="btnImport">📥 Импорт профил</button>
+  <button class="mbtn sec" id="btnSaveProf">📤 Запази профил</button>
+  <button class="mbtn sec" id="btnReset" title="Връща всички настройки по подразбиране">↺ Нулирай</button>
+</div>
+
+<div id="layout">
+  <aside id="sidebar">
+    <div id="gnav"></div>
+    <div class="legend">
+      <b>Легенда (сложност / риск)</b>
+      <div><span class="dot" style="background:var(--green)"></span> Базова — безопасно за всеки</div>
+      <div><span class="dot" style="background:var(--amber)"></span> Разширена — прочети обяснението</div>
+      <div><span class="dot" style="background:var(--red)"></span> Опасна — внимай!</div>
+      <div style="margin-top:8px">Броячът = колко настройки са променени от подразбираните. Профилът може да се провлачи (drag&amp;drop) върху приложението.</div>
+    </div>
+  </aside>
+
+  <main id="content"></main>
+
+  <aside id="right">
+    <div id="rtabs">
+      <button data-tab="sum" class="on">📋 Резюме</button>
+      <button data-tab="xml">📄 XML</button>
+      <button data-tab="help">❓ Помощ</button>
+    </div>
+    <div id="rbody">
+      <div id="tab-sum"></div>
+      <div id="tab-xml" style="display:none">
+        <div class="hint" style="margin-bottom:6px">Жив преглед на файла, който ще се генерира.</div>
+        <div id="xmlbox"></div>
+      </div>
+      <div id="tab-help" style="display:none" class="helpsec"></div>
+    </div>
+  </aside>
+</div>
+
+<div id="modal"><div class="box" id="modalBox"></div></div>
+<div id="toast"></div>
+
+<!-- Вградени скриптове (същите като отделните .ps1 файлове в папката) -->
+<script type="text/plain" id="embed-export">
+# ============================================================
+#  WinSetup Studio - Export-WinSettings.ps1 (v2)
+#  Чете настройките на ТЕКУЩИЯ компютър и записва JSON профил,
+#  който after това се импортира в WinSetupStudio.html
+#  („Импорт профил от JSON" бутон / drag&drop върху приложението).
+#
+#  Употреба (PowerShell, без нужда от админ за основните данни):
+#    powershell -ExecutionPolicy Bypass -File .\Export-WinSettings.ps1
+#  Опционално: -OutPath "D:\profiles\mypc.json"
+#  Администратор добавя и: компоненти (Hyper-V/WSL...), BitLocker,
+#  диск/партиции информация.
+# ============================================================
+[CmdletBinding()]
+param(
+    [string]$OutPath = "$env:USERPROFILE\Desktop\WinSetupStudio-profile.json"
+)
+
+$ErrorActionPreference = 'SilentlyContinue'
+
+function Test-Admin {
+    $id = [Security.Principal.WindowsIdentity]::GetCurrent()
+    (New-Object Security.Principal.WindowsPrincipal($id)).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
+function ConvertTo-UnattendBuild([string]$productName, [string]$displayVersion, [string]$buildNumber) {
+    # Целева версия в терминологията на WinSetup Studio.
+    # ВНИМАНИЕ: ProductName остава "Windows 10 Pro" дори на Windows 11 (legacy
+    # стойност), затова гледаме НОМЕРА на build-а: 22000+ = Windows 11.
+    $major = 0
+    if ($buildNumber -match '^(\d+)\.') { $major = [int]$Matches[1] }
+    if ($major -lt 22000) { return 'win10' }
+    switch ($displayVersion) {
+        '26H2' { return '26H2' }
+        '25H2' { return '25H2' }
+        '24H2' { return '24H2' }
+        '23H2' { return '23H2' }
+        '22H2' { return '22H2' }
+        default { return '25H2' }
+    }
+}
+
+Write-Host '== WinSetup Studio: четене на настройки ==' -ForegroundColor Cyan
+
+# ---------- Основна информация (без админ) ----------
+$cv = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
+$editionId    = $cv.EditionID                    # напр. Professional
+$productName  = $cv.ProductName                  # напр. Windows 11 Pro (legacy стойност!)
+$displayVer   = $cv.DisplayVersion               # напр. 25H2
+$buildNumber  = "$($cv.CurrentBuildNumber).$($cv.UBR)"
+
+$uiLang    = (Get-UICulture).Name               # език на интерфейса, напр. bg-BG
+$sysLocale = (Get-WinSystemLocale).Name         # SystemLocale
+$usrLocale = (Get-Culture).Name                 # UserLocale (формати, валута)
+$timeZone  = (Get-TimeZone).Id                  # напр. "FLE Standard Time" за България
+
+# Клавиатурни подредби -> формат "0402:00000402;0409:00000409"
+$tips = @()
+Get-WinUserLanguageList | ForEach-Object { $tips += $_.InputMethodTips }
+$inputLocale = ($tips | Select-Object -Unique) -join ';'
+
+$settings = [ordered]@{
+    computername = $env:COMPUTERNAME
+    username     = $env:USERNAME
+    uilanguage   = $uiLang
+    userlocale   = $usrLocale
+    systemlocale = $sysLocale
+    inputlocale  = $inputLocale
+    timezone     = $timeZone
+    edition      = $editionId
+    targetversion = ConvertTo-UnattendBuild $productName $displayVer $buildNumber
+}
+
+$computer = [ordered]@{
+    name          = $env:COMPUTERNAME
+    productName   = $productName
+    edition       = $editionId
+    displayVersion= $displayVer
+    build         = $buildNumber
+}
+
+# ---------- Хардуер (без админ) ----------
+$cpu   = (Get-CimInstance Win32_Processor | Select-Object -First 1).Name
+$ramGB = [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB, 1)
+$gpus  = @((Get-CimInstance Win32_VideoController) | ForEach-Object { $_.Name }) -join ', '
+$hardware = [ordered]@{
+    cpu = $cpu; ramGB = $ramGB; gpu = $gpus
+}
+
+# ---------- Инсталирани програми (без админ; подсказки в приложението) ----------
+$progNames = @()
+foreach ($root in 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*',
+                   'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*') {
+    Get-ItemProperty $root -ErrorAction SilentlyContinue | ForEach-Object {
+        if ($_.DisplayName) { $progNames += $_.DisplayName }
+    }
+}
+$programs = @($progNames | Sort-Object -Unique)
+
+# ---------- Администраторски секции ----------
+$isAdmin = Test-Admin
+$adminRequired = @()
+
+if ($isAdmin) {
+    # Опционални компоненти
+    $feat = @{}
+    $map = @{
+        hyperV  = 'Microsoft-Hyper-V-All'
+        wsl     = 'Microsoft-Windows-Subsystem-Linux'
+        sandbox = 'Containers-DisposableClientVM'
+        netFx3  = 'NetFx3'
+    }
+    foreach ($k in $map.Keys) {
+        $f = Get-WindowsOptionalFeature -Online -FeatureName $map[$k]
+        $feat[$k] = ($f.State -eq 'Enabled')
+    }
+
+    # BitLocker (системен том)
+    $bl = $null
+    $blv = Get-BitLockerVolume -MountPoint $env:SystemDrive
+    if ($blv) { $bl = @{ volumeStatus = [string]$blv.VolumeStatus; protectionStatus = [string]$blv.ProtectionStatus } }
+
+    # Дискове и партиции
+    $disks = @()
+    Get-Disk | ForEach-Object {
+        $d = $_
+        $parts = Get-Partition -DiskNumber $d.Number | ForEach-Object {
+            [ordered]@{ number = $_.PartitionNumber; driveLetter = "$($_.DriveLetter)"; sizeGB = [math]::Round($_.Size/1GB, 1); type = [string]$_.GptType }
+        }
+        $disks += [ordered]@{ number = $d.Number; friendlyName = $d.FriendlyName; sizeGB = [math]::Round($d.Size/1GB, 1); partitionStyle = [string]$d.PartitionStyle; busType = [string]$d.BusType; partitions = $parts }
+    }
+}
+else {
+    $adminRequired += 'features'
+    $adminRequired += 'bitlocker'
+    $adminRequired += 'disks'
+    Write-Host 'Забележка: не сте администратор - секции "features", "bitlocker" и "disks" са пропуснати.' -ForegroundColor Yellow
+    Write-Host 'Пуснете отново с "Като администратор", ако искате пълните данни.' -ForegroundColor Yellow
+}
+
+# ---------- Запис ----------
+$result = [ordered]@{
+    type        = 'winsetup-studio-profile'
+    version     = 2
+    generated   = (Get-Date -Format 'o')
+    computer    = $computer
+    hardware    = $hardware
+    settings    = $settings
+    programs    = $programs
+}
+if ($isAdmin) { $result.features = $feat; $result.bitlocker = $bl; $result.disks = $disks }
+$result.adminRequired = $adminRequired
+
+$json = ConvertTo-Json -InputObject $result -Depth 8
+try {
+    Set-Content -Path $OutPath -Value $json -Encoding UTF8 -ErrorAction Stop
+} catch {
+    Write-Host ('ГРЕШКА при запис на профила: ' + $_.Exception.Message) -ForegroundColor Red
+    exit 1
+}
+
+Write-Host ''
+Write-Host 'Готово! Профилът е записан в:' -ForegroundColor Green
+Write-Host "  $OutPath" -ForegroundColor Green
+Write-Host ''
+Write-Host 'Следваща стъпка: отвори WinSetupStudio.html -> „Импорт профил" или провлачи файла върху него.'
+Write-Host ("Резюме: $productName ($displayVer), $cpu, ${ramGB}GB RAM, $($programs.Count) програми")
+</script>
+<script type="text/plain" id="embed-usb">
+# ============================================================
+#  WinSetup Studio - Make-SetupUSB.ps1 (v2)
+#  Подготвя ИНСТАЛАЦИОННА ФЛАШКА с вграден autounattend.xml.
+#
+#  Какво прави:
+#    1. ИЗТРИВА избраната флашка и я форматира FAT32 (задължително
+#       за UEFI boot; FAT32 = max 32GB том и max 4GB файл!)
+#    2. Копира съдържанието на Windows ISO (или папка) на флашката
+#    3. Ако sources\install.wim е ПОГЛЕМАЛНА ОТ 4GB -> разделя го на
+#       install.swm (dism /Split-Image). Setup разчита .swm автоматично.
+#       (Това е "компресията, която се чупеше".)
+#    4. Слага autounattend.xml в ROOT на флашката.
+#    5. Копира и самия WinSetup Studio инструмент на флашката
+#       (програмата пътува с нея) - изключва се с -NoApp.
+#
+#  Употреба (PowerShell КАТО АДМИНИСТРАТОР):
+#    # с изрична буква:
+#    .\Make-SetupUSB.ps1 -IsoPath "C:\ISO\Win11.iso" -UsbDrive "E:"
+#    # без буква -> сам изброява USB флашките и пита:
+#    .\Make-SetupUSB.ps1 -IsoPath "C:\ISO\Win11.iso"
+#    # разархивиран ISO вместо .iso файл:
+#    .\Make-SetupUSB.ps1 -SourceDir "D:\Win11-ISO" -UsbDrive "E:"
+#    Добавете -WhatIf, за да видите плана БЕЗ нищо да се изпълнява.
+# ============================================================
+[CmdletBinding()]
+param(
+    [Parameter(ParameterSetName = 'Iso', Mandatory = $true)]
+    [string]$IsoPath,
+
+    [Parameter(ParameterSetName = 'Dir', Mandatory = $true)]
+    [string]$SourceDir,
+
+    [string]$UsbDrive,          # буква на флашката, напр. "E:" - ОПЦИОНАЛНО
+
+    [string]$UnattendPath = "$PSScriptRoot\autounattend.xml",
+
+    [switch]$NoApp,             # не копирай WinSetup Studio инструмента на флашката
+
+    [switch]$Force,             # позволи и НЕ-USB диск (изричният избор е твой отговор)
+
+    [switch]$WhatIf
+)
+
+$ErrorActionPreference = 'Stop'
+
+function Test-Admin {
+    $id = [Security.Principal.WindowsIdentity]::GetCurrent()
+    (New-Object Security.Principal.WindowsPrincipal($id)).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
+function Assert-Cmd([string]$cmd, [string]$okMsg) {
+    Write-Host "  > $cmd" -ForegroundColor DarkGray
+    Invoke-Expression $cmd
+    if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw "Командата върна грешка ($LASTEXITCODE): $cmd" }
+    if ($okMsg) { Write-Host "  OK: $okMsg" -ForegroundColor Green }
+}
+# (Assert-Cmd вече не се използва за dism — виж стъпка 3; оставен е за съвместимост.)
+
+Write-Host '== WinSetup Studio: подготовка на инсталационна флашка ==' -ForegroundColor Cyan
+
+if (-not (Test-Admin)) {
+    throw 'Трябва да стартирате скрипта КАТО АДМИНИСТРАТОР (десен клик -> PowerShell (Admin)).'
+}
+
+# ---------- Валидация на източника ----------
+if ($PSCmdlet.ParameterSetName -eq 'Iso') {
+    if (-not (Test-Path $IsoPath)) { throw "Не намирам ISO: $IsoPath" }
+} else {
+    if (-not (Test-Path $SourceDir)) { throw "Не намирам папка: $SourceDir" }
+}
+
+if (-not (Test-Path $UnattendPath)) {
+    Write-Host "ПРЕДУПРЕЖДЕНИЕ: не намирам $UnattendPath - ще продължа БЕЗ unattend файл." -ForegroundColor Yellow
+    Write-Host '(Можете да копирате autounattend.xml на флашката и ръчно после.)' -ForegroundColor Yellow
+}
+
+# ---------- Избор на флашка ----------
+$usbDisk = $null
+if ($UsbDrive) {
+    if (-not $UsbDrive.EndsWith(':')) { $UsbDrive = "$UsbDrive`:" }
+    $UsbDrive = $UsbDrive.TrimEnd('\')
+    $part = Get-Partition -DriveLetter $UsbDrive.TrimEnd(':') -ErrorAction SilentlyContinue
+    if (-not $part) { throw "Не намирам дял с буква $UsbDrive. Проверете буквата на флашката (Get-Volume)." }
+    $usbDisk = Get-Disk -Number $part.DiskNumber
+    $usbSizeGB = [math]::Round($usbDisk.Size / 1GB, 1)
+} else {
+    # Интерактивен избор: изброявам USB дисковете
+    $usbs = @(Get-Disk | Where-Object { $_.BusType -eq 'USB' })
+    if (-not $usbs.Count) { throw 'Не виждам USB дискове. Закачете флашката или подайте -UsbDrive "E:".' }
+    Write-Host ''
+    Write-Host 'Намерени USB дискове:' -ForegroundColor Cyan
+    for ($i = 0; $i -lt $usbs.Count; $i++) {
+        $v = Get-Partition -DiskNumber $usbs[$i].Number -ErrorAction SilentlyContinue |
+             Where-Object { $_.DriveLetter } | Select-Object -First 1
+        $letter = if ($v) { "$($v.DriveLetter):" } else { '(без буква)' }
+        Write-Host ('  [' + ($i + 1) + '] Диск #' + $usbs[$i].Number + '  ' + $usbs[$i].FriendlyName +
+                    '  ' + [math]::Round($usbs[$i].Size / 1GB, 1) + ' GB  ' + $letter)
+    }
+    $pick = Read-Host 'Коя е флашката? (номер, празно = отказ)'
+    if (-not $pick) { Write-Host 'Отказано.'; return }
+    $idx = 0
+    if (-not [int]::TryParse($pick, [ref]$idx) -or $idx -lt 1 -or $idx -gt $usbs.Count) {
+        throw 'Невалиден номер.'
+    }
+    $usbDisk = $usbs[$idx - 1]
+    $usbSizeGB = [math]::Round($usbDisk.Size / 1GB, 1)
+}
+
+Write-Host ''
+Write-Host 'ЦЕЛ:      Диск #'$usbDisk.Number '-' $usbDisk.FriendlyName -ForegroundColor Yellow
+# ВСИЧКИ деструктивни проверки са ПРЕДИ първото изтриване (fail fast):
+if ($usbDisk.BusType -ne 'USB' -and -not $Force) {
+    throw ('Избраният диск НЕ е USB (BusType=' + $usbDisk.BusType + '). Ако СИГУРНО искаш този диск - подай -Force.')
+}
+if ($usbDisk.IsBoot -or $usbDisk.IsSystem) {
+    throw 'Избраният диск е BOOT/SYSTEM диск на Windows - ОТКАЗВАМ да го изтрия!'
+}
+if ($usbSizeGB -gt 32) {
+    throw ('Флашката е по-голяма от 32GB - Windows не може да я форматира FAT32. ' +
+           'Два варианта: (а) използвайте флашка до 32GB; (б) форматirайте NTFS и я подгответе ' +
+           'с Rufus (опция UEFI:NTFS), после сложете autounattend.xml в root.')
+}
+Write-Host 'ГОЛЕМИНА на флашката:' $usbSizeGB 'GB'
+Write-Host 'ВНИМАНИЕ: ВСИЧКО на флашката ще бъде ИЗТРИТО!' -ForegroundColor Red
+
+if (-not $WhatIf) {
+    $a = Read-Host 'Продължи? (напишете ДА)'
+    if ($a -cne 'ДА') { Write-Host 'Отказано.'; return }
+}
+
+# ---------- План / изпълнение ----------
+Write-Host ''
+if ($WhatIf) { Write-Host 'WHATIF - нищо няма да се изпълни, само планът:' -ForegroundColor Magenta }
+
+# 1. Форматиране
+Write-Host '[1/6] Изчистване и форматиране на флашката...' -ForegroundColor Cyan
+if (-not $WhatIf) {
+    # повторна проверка на идентичността МИГ ПРЕДИ изтриването
+    $re = Get-Disk -Number $usbDisk.Number
+    if (-not $re -or $re.IsBoot -or $re.IsSystem) { throw 'Дискът се промени между избора и изтриването - СПИРАМ за безопасност.' }
+    Clear-Disk -Number $usbDisk.Number -RemoveData -RemoveOEM -Confirm:$false
+    Initialize-Disk -Number $usbDisk.Number -PartitionStyle GPT
+    $np = New-Partition -DiskNumber $usbDisk.Number -UseMaximumSize -AssignDriveLetter
+    $np = Get-Partition -DiskNumber $usbDisk.Number | Where-Object { $_.PartitionNumber -eq $np.PartitionNumber }
+    $nl = "$($np.DriveLetter):"
+    Format-Volume -DriveLetter $np.DriveLetter -FileSystem FAT32 -NewFileSystemLabel 'WINSETUP' -Confirm:$false | Out-Null
+    Write-Host '  Форматирана като FAT32 на ' $nl -ForegroundColor Green
+} else {
+    Write-Host '  WHATIF: Clear-Disk, Initialize-Disk GPT, New-Partition, Format-Volume FAT32'
+}
+
+# 2. Източник (+3. wim split в try/finally — ISO се демонтира ВИНАГИ, дори при грешка)
+Write-Host '[2/6] Копиране на инсталационните файлове...' -ForegroundColor Cyan
+$srcLetter = $null
+try {
+    if (-not $WhatIf) {
+        if ($PSCmdlet.ParameterSetName -eq 'Iso') {
+            $mdi = Mount-DiskImage -ImagePath $IsoPath -PassThru
+            $srcLetter = ($mdi | Get-Volume).DriveLetter
+            $src = "$srcLetter`:\"
+        } else { $src = $SourceDir.TrimEnd('\') + '\' }
+        Write-Host '  Източник: ' $src
+        robocopy $src "$($np.DriveLetter):\" /E /NFL /NDL /NJH /NJS /R:2 /W:2 | Out-Null
+        if ($LASTEXITCODE -ge 8) { throw 'Robocopy върна грешка при копирането.' }
+        Write-Host '  Копирането приключи.' -ForegroundColor Green
+    } else {
+        Write-Host '  WHATIF: Mount ISO / robocopy източник -> флашка'
+    }
+
+    # 3. install.wim > 4GB -> split
+    Write-Host '[3/6] Проверка за файлове над 4GB (FAT32 лимит)...' -ForegroundColor Cyan
+    if (-not $WhatIf) {
+        $wim = "$($np.DriveLetter):\sources\install.wim"
+        if (Test-Path $wim) {
+            $gb = (Get-Item $wim).Length / 1GB
+            if ($gb -ge 4) {
+                Write-Host ("  install.wim е {0:N2} GB - разделям на install.swm..." -f $gb) -ForegroundColor Yellow
+                # директно извикване (без Invoke-Expression) — безопасно при пътища със спейсове
+                & dism /Split-Image /ImageFile:"$wim" /SWMFile:"$($np.DriveLetter):\sources\install.swm" /FileSize:3800 | Out-Null
+                if ($LASTEXITCODE -ne 0) { throw "dism /Split-Image върна грешка ($LASTEXITCODE)" }
+                Write-Host '  install.swm създаден (Setup го разчита автоматично).' -ForegroundColor Green
+                Remove-Item $wim -Force
+                Write-Host '  Оригиналният install.wim е премахнат от флашката.' -ForegroundColor Green
+            } else {
+                Write-Host ('  install.wim е {0:N2} GB - под лимита, не е нужно разделяне.' -f $gb) -ForegroundColor Green
+            }
+        } else {
+            Write-Host '  Няма install.wim (вероятно install.esd - той е под 4GB). ОК.' -ForegroundColor Green
+        }
+    } else {
+        Write-Host '  WHATIF: при install.wim >= 4GB -> dism /Split-Image /FileSize:3800'
+    }
+} finally {
+    if ($srcLetter) { try { Dismount-DiskImage -ImagePath $IsoPath | Out-Null } catch {} }
+}
+
+# 4. autounattend.xml в root (с UTF-8 BOM — Setup чете кириллицата reliably)
+Write-Host '[4/6] Поставяне на autounattend.xml в root...' -ForegroundColor Cyan
+if (-not $WhatIf -and (Test-Path $UnattendPath)) {
+    $dst = "$($np.DriveLetter):\autounattend.xml"
+    Copy-Item $UnattendPath $dst -Force
+    try {
+        $txt = [System.IO.File]::ReadAllText($dst, [System.Text.Encoding]::UTF8)
+        [System.IO.File]::WriteAllText($dst, $txt, (New-Object System.Text.UTF8Encoding $true))
+        Write-Host '  Готово (UTF-8 с BOM): ' $dst -ForegroundColor Green
+    } catch {
+        Write-Host '  Копирано (без BOM нормализация): ' $dst -ForegroundColor Yellow
+    }
+}
+
+# 5. Инструментът WinSetup Studio -> на флашката
+Write-Host '[5/6] Копиране на WinSetup Studio инструмента...' -ForegroundColor Cyan
+if (-not $NoApp) {
+    if (-not $WhatIf) {
+        $toolDir = "$($np.DriveLetter):\WinSetupStudio"
+        New-Item -ItemType Directory -Path $toolDir -Force | Out-Null
+        $tools = 'WinSetupStudio.html', 'WinSetupStudio.cmd', 'WinSetupStudio-Server.ps1',
+                 'Get-WindowsIso.ps1', 'Make-SetupUSB.ps1', 'Export-WinSettings.ps1', 'README.md'
+        foreach ($t in $tools) {
+            $p = Join-Path $PSScriptRoot $t
+            if (Test-Path $p) { Copy-Item $p $toolDir -Force }
+        }
+        # профилни JSON файлове до скрипта, ако има
+        Get-ChildItem $PSScriptRoot -Filter '*profile*.json' -ErrorAction SilentlyContinue |
+            Copy-Item -Destination $toolDir -Force -ErrorAction SilentlyContinue
+        Write-Host '  Инструментът е на флашката: ' "$toolDir" -ForegroundColor Green
+        Write-Host '  (Отваряте го от всяка машина: двойный клик върху WinSetupStudio.html)' -ForegroundColor DarkGray
+    } else {
+        Write-Host '  WHATIF: копиране на WinSetupStudio.html/.cmd/.ps1 + README в \WinSetupStudio\'
+    }
+} else {
+    Write-Host '  (-NoApp: пропускам копирането на инструмента)'
+}
+
+# 6. Крайни инструкции
+Write-Host '[6/6] ГОТОВО!' -ForegroundColor Green
+Write-Host ''
+Write-Host 'Как да инсталирате:' -ForegroundColor Cyan
+Write-Host '  1. Boot от флашката (UEFI). Инсталацията тече сама - без въпроси.'
+Write-Host '  2. Ако 25H2/26H2 "ConX" режим игнорира файла: Shift+F10 в началото ->'
+Write-Host '     setup.exe /Unattend:E:\autounattend.xml  (буквата на флашката може да е друга).'
+Write-Host '  3. Ако пак поиска MS акаунт: изключете интернет кабела/Wi-Fi, или в CMD:'
+Write-Host '     start ms-cxh:localonly'
+Write-Host ''
+Write-Host 'Бележка: файлът се чете от Setup САМО в root директорията на носителя.'
+</script>
+<script type="text/plain" id="embed-iso">
+# ============================================================
+#  WinSetup Studio - Get-WindowsIso.ps1
+#  Взима ОФИЦИАЛНА директна връзка за Windows ISO от сървърите
+#  на Microsoft (същият "software-download-connector" API, който
+#  ползва страницата на Microsoft и скриптът Fido v1.72) и сваля
+#  ISO-а. Не е пиратство - същите линкове дава microsoft.com.
+#
+#  Употреба:
+#    # списък на наличните езици (без сваляне):
+#    powershell -ExecutionPolicy Bypass -File Get-WindowsIso.ps1 -ListLangs
+#
+#    # директна връзка без сваляне (за проверка):
+#    powershell -ExecutionPolicy Bypass -File Get-WindowsIso.ps1 -List
+#
+#    # пълно сваляне (5-6 GB, отнема време):
+#    powershell -ExecutionPolicy Bypass -File Get-WindowsIso.ps1 `
+#        -Version Win11 -Language Bulgarian `
+#        -OutPath "$env:USERPROFILE\Downloads\Win11_26H2_bulgarian.iso"
+# ============================================================
+[CmdletBinding()]
+param(
+    [ValidateSet('Win11', 'Win10')]
+    [string]$Version = 'Win11',
+
+    [string]$Language = 'Bulgarian',   # име на езика; виж -ListLangs за точните имена
+
+    [string]$OutPath = '',
+
+    [switch]$List,        # показва директната връзка БЕЗ да сваля
+    [switch]$ListLangs    # показва наличните езици за избраната версия
+)
+
+$ErrorActionPreference = 'Stop'
+$DefaultTimeout = 40
+# PS 5.1: гарантирай TLS 1.2 (без това старите .NET настройки чупят HTTPS) + без бавния progress render
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+$ProgressPreference = 'SilentlyContinue'
+
+# productEditionId таблица (извлечена от Fido v1.72; Microsoft я сменя
+# при нови версии - ако API-то откаже, линковете по-долу са резервният път)
+$EDITION_IDS = @{
+    Win11 = 3813    # Windows 11 26H2 Home/Pro/Edu (x64) - Build 26300, 2026.09
+    Win10 = 2618    # Windows 10 22H2 Home/Pro/Edu (x64)
+}
+$PAGE = @{ Win11 = 'windows11'; Win10 = 'windows11' }  # referer сегмент
+
+$OrgId      = 'y6jn8c31'
+$ProfileId  = '606624d44113'
+$InstanceId = '560dc9f3-1aa5-4a2f-b63c-9e18f8d0e175'
+$UA         = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36'
+
+function Write-Step([string]$m) { Write-Host '==> ' $m -ForegroundColor Cyan }
+
+# ---------- 1. Сесия: GUID + "избелване" през vlscppe и ov-df ----------
+function New-ConnectorSession {
+    $guid = [guid]::NewGuid().ToString()
+
+    Write-Step 'Регистрирам сесията (vlscppe)...'
+    try {
+        Invoke-WebRequest -UseBasicParsing -TimeoutSec $DefaultTimeout -MaximumRedirection 0 `
+            -UserAgent $UA `
+            -Uri "https://vlscppe.microsoft.com/tags?org_id=$OrgId&session_id=$guid" | Out-Null
+    } catch {
+        Write-Host '  (предупреждение: vlscppe не отговори очаквано - продължавам)' -ForegroundColor Yellow
+    }
+
+    Write-Step 'Регистрирам сесията (ov-df)...'
+    try {
+        $mdt = Invoke-RestMethod -UseBasicParsing -TimeoutSec $DefaultTimeout -UserAgent $UA `
+            -Uri "https://ov-df.microsoft.com/mdt.js?instanceId=$InstanceId&PageId=si&session_id=$guid"
+        $w      = [regex]::Match($mdt, '[?&]w=([A-F0-9]+)').Groups[1].Value
+        $rticks = [regex]::Match($mdt, 'rticks\=\"\+?(\d+)').Groups[1].Value
+        if (-not $w -or -not $rticks) { throw 'не мога да извлека w/rticks от mdt.js' }
+        $epoch = [DateTimeOffset]::Now.ToUnixTimeMilliseconds()
+        Invoke-WebRequest -UseBasicParsing -TimeoutSec $DefaultTimeout -MaximumRedirection 0 `
+            -UserAgent $UA `
+            -Uri "https://ov-df.microsoft.com/?session_id=$guid&CustomerId=$InstanceId&PageId=si&w=$w&mdt=$epoch&rticks=$rticks" | Out-Null
+    } catch {
+        Write-Host '  (предупреждение: ov-df не отговори очаквано - продължавам)' -ForegroundColor Yellow
+    }
+    return $guid
+}
+
+# ---------- 2. SKU информация: езици ----------
+function Get-Skus([string]$guid, [int]$editionId, [string]$refererSegment) {
+    $url = "https://www.microsoft.com/software-download-connector/api/getskuinformationbyproductedition" +
+           "?profile=$ProfileId&productEditionId=$editionId&SKU=undefined&friendlyFileName=undefined" +
+           "&Locale=en-US&sessionID=$guid"
+    $attempt = 0
+    while ($true) {
+        if ($attempt -ne 0) { Start-Sleep -Seconds 2 }
+        $r = Invoke-RestMethod -UseBasicParsing -TimeoutSec $DefaultTimeout -Uri $url
+        if ($null -eq $r) { if ($attempt++ -le 1) { continue }; throw 'Сървърът не върна данни за езиците.' }
+        if ($r.Errors) {
+            if ($r.Errors[0].Type -eq 9) {
+                throw ('Microsoft ограничи сесията (код 715-123130). Изчакай няколко минути или ' +
+                       'свали от официалната страница: https://www.microsoft.com/software-download/' + $refererSegment)
+            }
+            if ($attempt++ -le 1) { continue }
+            throw ('Грешка от API: ' + $r.Errors[0].Value)
+        }
+        return $r.Skus
+    }
+}
+
+# ---------- 3. Директна връзка за x64 ----------
+function Get-IsoLink([string]$guid, [int]$skuId, [string]$refererSegment) {
+    $url = "https://www.microsoft.com/software-download-connector/api/GetProductDownloadLinksBySku" +
+           "?profile=$ProfileId&productEditionId=undefined&SKU=$skuId&friendlyFileName=undefined" +
+           "&Locale=en-US&sessionID=$guid"
+    # Referer е ЗАДЪЛЖИТЕЛЕН за тази заявка, иначе сървърът отказва
+    $r = Invoke-RestMethod -UseBasicParsing -TimeoutSec $DefaultTimeout `
+            -Headers @{ 'Referer' = "https://www.microsoft.com/software-download/$refererSegment" } -Uri $url
+    if ($r.Errors) {
+        if ($r.Errors[0].Type -eq 9) {
+            throw ('Microsoft ограничи сесията (код 715-123130). Изчакай и пробвай отново, или ' +
+                   'ползвай официалната страница: https://www.microsoft.com/software-download/' + $refererSegment)
+        }
+        throw ('Грешка от API: ' + $r.Errors[0].Value)
+    }
+    # Избор на x64: Доказано (11.2026) DownloadType кодовете НЕ са надеждни
+    # (единствената опция за x64 идва с тип 2), затова гледаме X64 в URI/име,
+    # после тип 1, и накрая fallback на първата опция.
+    $opt = @($r.ProductDownloadOptions | Where-Object { ($_.Uri -match 'X64') -or ($_.Name -match 'X64') })
+    if (-not $opt) { $opt = @($r.ProductDownloadOptions | Where-Object { [int]$_.DownloadType -eq 1 }) }
+    if (-not $opt) { $opt = @($r.ProductDownloadOptions) }
+    if (-not $opt.Count) { throw 'Не намерих x64 ISO връзка в отговора.' }
+    return $opt[0].Uri
+}
+
+# ============================================================
+try {
+    $editionId = [int]$EDITION_IDS[$Version]
+    $seg       = $PAGE[$Version]
+    $guid      = New-ConnectorSession
+
+    Write-Step "Вземам езиците за $Version (editionId $editionId)..."
+    $skus = Get-Skus $guid $editionId $seg
+
+    if ($ListLangs) {
+        Write-Host ''
+        Write-Host 'Налични езици (-Language приема част от това име):' -ForegroundColor Green
+        $skus | ForEach-Object {
+            $loc = if ($_.LocalizedLanguage) { '  [' + $_.LocalizedLanguage + ']' } else { '' }
+            Write-Host ('  ' + $_.Language + $loc)
+        }
+        return
+    }
+
+    $sku = $skus | Where-Object { $_.Language -like "*$Language*" } | Select-Object -First 1
+    if (-not $sku) {
+        Write-Host 'Не намирам този език. Наличните имена:' -ForegroundColor Yellow
+        $skus | ForEach-Object { Write-Host ('  ' + $_.Language) }
+        throw "Езикът '$Language' не е наличен за $Version."
+    }
+    Write-Host ('  избран: ' + $sku.Language + ' (SKU ' + $sku.Id + ')') -ForegroundColor DarkGray
+
+    Write-Step 'Вземам директната връзка (x64)...'
+    # 2 опита с свежа сесия при транзиентна грешка
+    $isoUrl = $null
+    for ($att = 0; $att -lt 2 -and -not $isoUrl; $att++) {
+        if ($att -ne 0) { Start-Sleep -Seconds 2; $guid = New-ConnectorSession }
+        try { $isoUrl = Get-IsoLink $guid ([int]$sku.Id) $seg } catch { if ($att -eq 1) { throw } }
+    }
+    Write-Host ''
+    Write-Host 'ОФИЦИАЛНА ВРЪЗКА ОТ MICROSOFT:' -ForegroundColor Green
+    Write-Host $isoUrl
+    Write-Host ''
+
+    if ($List) { Write-Host '(-List: не свалям. Сложи връзката в браузър/IDM или пусни без -List.)' -ForegroundColor Yellow; return }
+
+    if (-not $OutPath) {
+        $lang = ($sku.Language -replace '[^\w]+', '_')
+        $OutPath = "$env:USERPROFILE\Downloads\${Version}_$lang.iso"
+    }
+    $cl = (Invoke-WebRequest -UseBasicParsing -Method Head -TimeoutSec 60 -Uri $isoUrl).Headers['Content-Length']
+    if ($cl) { Write-Host ('Свалям ' + [math]::Round($cl / 1GB, 2) + ' GB в: ' + $OutPath) }
+    else { Write-Host ('Свалям в: ' + $OutPath) }
+
+    if (Get-Command Start-BitsTransfer -ErrorAction SilentlyContinue) {
+        Start-BitsTransfer -Source $isoUrl -Destination $OutPath -DisplayName 'WinSetup Studio: Windows ISO'
+    } else {
+        Invoke-WebRequest -UseBasicParsing -Uri $isoUrl -OutFile $OutPath
+    }
+    Write-Host ''
+    Write-Host 'ГОТОВО! ISO-ът е в: ' $OutPath -ForegroundColor Green
+    Write-Host 'Следваща стъпка: Make-SetupUSB.ps1 -IsoPath (този път) -UsbDrive ...'
+}
+catch {
+    Write-Host ''
+    Write-Host ('ГРЕШКА: ' + $_.Exception.Message) -ForegroundColor Red
+    Write-Host ''
+    Write-Host 'Резервни (винаги работещи) варианти:' -ForegroundColor Yellow
+    Write-Host '  Windows 11: https://www.microsoft.com/software-download/windows11'
+    Write-Host '  Windows 10: https://www.microsoft.com/software-download/windows10'
+    exit 1
+}
+</script>
+
+<script>
+"use strict";
+/* ================================================================
+   WinSetup Studio v2 — каталог, генератор и UI.
+   Каталогът е обикновен JS масив: лесно добавяш нова настройка.
+   ================================================================ */
+
+/* ---------- утилити ---------- */
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function utf16b64(s){const b=[];for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);b.push(c&255,(c>>8)&255)}let bin='';for(const x of b)bin+=String.fromCharCode(x);return btoa(bin)}
+function $(id){return document.getElementById(id)}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600)}
+function download(name,text,mime){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:(mime||'text/plain')+';charset=utf-8'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
+
+/* ---------- справочни таблици ---------- */
+const KEYS={
+  Home:'YTMG3-N6DKC-DKB77-7M9GH-8HVX7', HomeN:'4CPRK-NM3K3-X6XXQ-RXX86-WXCHW', HomeSL:'7HNRX-D7KGG-3K4RQ-4WPJ4-YTDFH',
+  Pro:'VK7JG-NPHTM-C97JM-9MPGT-3V66T', ProN:'MH37W-N47XK-V7XM9-C7227-GCQG9',
+  ProWS:'NRG8B-VKK3Q-CXVCJ-9G2XF-6Q84J', Education:'NW6C2-QMPVW-D7KKK-3GKT6-VCFB2', Enterprise:'NPPR9-FWDCX-D2C8J-H872K-2YT43',
+  LTSC2024:'M7XTQ-FN8P6-TTKYV-9D4CC-J462D', IoTLTSC2024:'KBN8V-HFGQ4-MGXVD-347P6-PDQGT'
+};
+const ED_LABELS={auto:'Без ключ — автоизбор (BIOS лиценз / изданието на ISO)',Home:'Windows 11/10 Home',HomeN:'Windows 11/10 Home N',HomeSL:'Windows 11 Home Single Language',Pro:'Windows 11/10 Pro (най-често)',ProN:'Windows 11/10 Pro N',ProWS:'Windows 11/10 Pro for Workstations',Education:'Windows 11/10 Education',Enterprise:'Windows 11/10 Enterprise',LTSC2024:'Windows 11 Enterprise LTSC 2024',IoTLTSC2024:'Windows IoT Enterprise LTSC 2024'};
+const LOCALES={
+  'bg-BG':'0402:00000402;0409:00000409','en-US':'0409:00000409','en-GB':'0809:00000809','de-DE':'0407:00000407','fr-FR':'040c:0000040c',
+  'it-IT':'0410:00000410','es-ES':'040a:0000040a','ru-RU':'0419:00000419','tr-TR':'041f:0000041f','el-GR':'0408:00000408','ro-RO':'0418:00000418',
+  'pl-PL':'0415:00000415','hu-HU':'040e:0000040e','cs-CZ':'0405:00000405','uk-UA':'0422:00000422','sr-Latn-RS':'081a:0000081a','mk-MK':'042f:0000042f',
+  'nl-NL':'0413:00000413','sv-SE':'041d:0000041d','ja-JP':'0411:00000411','ko-KR':'0412:00000412','zh-CN':'0804:00000804','pt-BR':'0416:00000416'
+};
+const TZ=['FLE Standard Time','Central Europe Standard Time','Central European Standard Time','W. Europe Standard Time','Romance Standard Time','GTB Standard Time','E. Europe Standard Time','Turkish Standard Time','Russian Standard Time','GMT Standard Time','UTC','Azores Standard Time','Arabian Standard Time','India Standard Time','China Standard Time','Korea Standard Time','Tokyo Standard Time','AUS Eastern Standard Time','US Eastern Standard Time','US Pacific Standard Time'];
+const LANG_OPTS=[['bg-BG','Български'],['en-US','English (US)'],['en-GB','English (UK)'],['de-DE','Deutsch'],['fr-FR','Français'],['it-IT','Italiano'],['es-ES','Español'],['pt-BR','Português (BR)'],['nl-NL','Nederlands'],['sv-SE','Svenska'],['pl-PL','Polski'],['hu-HU','Magyar'],['cs-CZ','Čeština'],['ro-RO','Română'],['el-GR','Ελληνικά'],['tr-TR','Türkçe'],['ru-RU','Русский'],['uk-UA','Українська'],['sr-Latn-RS','Srpski'],['mk-MK','Македонски'],['ja-JP','日本語'],['ko-KR','한국어'],['zh-CN','中文(简体)']];
+
+/* Каталог приложения за авто-инсталация (winget) — олекотен WinUtil */
+const APPCATALOG=[
+ {cat:'🌐 Браузъри',items:[
+   {id:'Google.Chrome',n:'Google Chrome',h:'най-разпространеният браузър'},
+   {id:'Mozilla.Firefox',n:'Mozilla Firefox',h:'независим, поверителност-ориентиран'},
+   {id:'Brave.Brave',n:'Brave',h:'със вграден блокер на реклами'}]},
+ {cat:'📦 Файлове и архиви',items:[
+   {id:'7zip.7zip',n:'7-Zip',h:'архиватор — задължителен'},
+   {id:'voidtools.Everything',n:'Everything',h:'мгновено търсене на файлове по целия диск'},
+   {id:'AntibodySoftware.WizTree',n:'WizTree',h:'какво заема мястото на диска'}]},
+ {cat:'🎬 Медия',items:[
+   {id:'VideoLAN.VLC',n:'VLC',h:'възпроизвежда всичко'},
+   {id:'IrfanView.IrfanView',n:'IrfanView',h:'лек гледач на изображения'},
+   {id:'foobar2000.foobar2000',n:'foobar2000',h:'минималистичен музикален плеър'}]},
+ {cat:'📄 Документи',items:[
+   {id:'Notepad++.Notepad++',n:'Notepad++',h:'текстов редактор — много полезен'},
+   {id:'LibreOffice.LibreOffice',h:'Word/Excel алтернатива, безплатна',n:'LibreOffice'},
+   {id:'SumatraPDF.SumatraPDF',n:'SumatraPDF',h:'бърз PDF четец'},
+   {id:'Adobe.Acrobat.Reader.64-bit',n:'Adobe Acrobat Reader',h:'стандартният PDF четец'}]},
+ {cat:'🛠 Разработка',items:[
+   {id:'Microsoft.PowerShell',n:'PowerShell 7',h:'модерният PowerShell (pwsh)'},
+   {id:'Microsoft.VisualStudioCode',n:'VS Code',h:'редактор за код и текст'},
+   {id:'Git.Git',n:'Git',h:'версиониране на код'},
+   {id:'Python.Python.3.12',n:'Python 3.12',h:'език за скриптове'}]},
+ {cat:'🖥 Комфорт',items:[
+   {id:'ShareX.ShareX',n:'ShareX',h:'скрийншоти и запис — супер мощен'},
+   {id:'Discord.Discord',n:'Discord',h:'гласови чатове'},
+   {id:'TelegramMessenger.TelegramDesktop',n:'Telegram',h:'месинджър'},
+   {id:'Zoom.Zoom',n:'Zoom',h:'видео срещи'}]},
+ {cat:'🎮 Игри и медиа',items:[
+   {id:'Valve.Steam',n:'Steam',h:'игрална платформа'},
+   {id:'Spotify.Spotify',n:'Spotify',h:'музика'}]},
+ {cat:'📡 Мрежа',items:[
+   {id:'qBittorrent.qBittorrent',n:'qBittorrent',h:'торент клиент без реклами'}]}
+];
+
+/* ---------- каталог групи и настройки ----------
+   level: green | amber | red   core: показва се и в Базов изглед
+   type: toggle | select | text | password | number | note        */
+const GROUPS=[
+ {id:'localization',title:'1. Локализация',ic:'🌐',desc:'Език, клавиатура, часова зона'},
+ {id:'edition',title:'2. Издание и ключ',ic:'🔑',desc:'Издание и generic ключ'},
+ {id:'bypass',title:'3. Bypass ограничения',ic:'🔓',desc:'Хардуерни проверки и MS акаунт'},
+ {id:'disk',title:'4. Дялове',ic:'💾',desc:'Къде да се инсталира'},
+ {id:'users',title:'5. Потребители',ic:'👤',desc:'Акаунти, пароли, автологин'},
+ {id:'oobe',title:'6. OOBE и поверителност',ic:'🛡️',desc:'Екрани след инсталацията'},
+ {id:'features',title:'7. Компоненти',ic:'🧰',desc:'Hyper-V, WSL, .NET'},
+ {id:'apps',title:'8. Приложения',ic:'📦',desc:'Авто-инсталация при първия вход (каталог + winget)'},
+ {id:'debloat',title:'9. Debloat и твикс',ic:'🧹',desc:'Приложения и настройки след входа'},
+ {id:'drivers',title:'10. Драйвери и ъпдейти',ic:'🛠️',desc:'Драйвери от флашката, Dynamic Update'},
+ {id:'network',title:'11. Мрежа и домейн',ic:'📡',desc:'Име на компютъра, Workgroup/Domain'}
+];
+
+const S=[
+/* ===== 1. Локализация ===== */
+{id:'targetversion',g:'localization',t:'select',lvl:'green',core:1,def:'26H2',label:'Целева версия на Windows',
+ opts:[['26H2','Windows 11 26H2 (най-нова)'],['25H2','Windows 11 25H2'],['24H2','Windows 11 24H2'],['23H2','Windows 11 23H2'],['22H2','Windows 11 22H2'],['win10','Windows 10 (22H2)']],
+ what:'Версията на ISO-а, който ще инсталираш. Влияе върху кои bypass-и са нужни и върху предупрежденията. Фактите за bypass-ите са сверени и работят към 25H2/26H2.',
+ when:'Съвпада с версиата на медията — новият ISO от Microsoft винаги е най-новата версия.',risk:'Ако версията не съвпада с ISO-а, само предупрежденията стават неточни — самият файл работи.'},
+{id:'uilanguage',g:'localization',t:'select',lvl:'green',core:1,def:'bg-BG',label:'Език на инсталацията (UI)',
+ opts:LANG_OPTS,auto:['inputlocale','userlocale','systemlocale'],
+ what:'Езикът на самата инсталация и на Windows след нея (UILanguage). При „Български“ инсталаторът и системата са на български.',
+ when:'Винаги.',risk:'Няма. Ако ISO-ът е само с един език, Windows ще добави езиковия пакет след инсталация.'},
+{id:'inputlocale',g:'localization',t:'text',lvl:'green',core:1,def:'0402:00000402;0409:00000409',label:'Клавиатурни подредби',
+ what:'Списък с подредби във вид „код:подредба“, разделени с „;“. 0402:00000402 = българска (БДС); 0409:00000409 = US английска.',
+ when:'Винаги — за BG машина остави по подразбиране (BG + EN).',risk:'Няма. Сложни IME подредби (японски/китайски) се задават с дълги GUID формати.'},
+{id:'userlocale',g:'localization',t:'text',lvl:'amber',def:'bg-BG',label:'Формати (UserLocale)',
+ what:'Формат за дати, време, валута и числа (напр. bg-BG → 17.11.2026 г., лв.).',
+ when:'Ако искаш български формати при английски интерфейс.',risk:'Няма.'},
+{id:'systemlocale',g:'localization',t:'text',lvl:'amber',def:'bg-BG',label:'SystemLocale (non-Unicode)',
+ what:'Езикът за програми, които не поддържат Unicode („legacy“ кодова страница). bg-BG = кирилица се показва правилно в стари програми.',
+ when:'Ако ползваш стари програми с кирилица.',risk:'Смяната СЛЕД инсталация изисква рестарт; зададен тук — идеално.'},
+{id:'timezone',g:'localization',t:'select',lvl:'green',core:1,def:'FLE Standard Time',label:'Часова зона',
+ opts:TZ.map(z=>[z,z]),
+ what:'Времевата зона след инсталацията. „FLE Standard Time“ = България (източноевропейско време + лятно часово време).',
+ when:'Винаги. Без нея Windows се сетва по местоположение — но изисква интернет.',risk:'Няма. Пълният списък: Get-TimeZone -ListAvailable.'},
+
+/* ===== 2. Издание и ключ ===== */
+{id:'edition',g:'edition',t:'select',lvl:'green',core:1,def:'Pro',label:'Издание',auto:['productkey'],
+ opts:Object.keys(ED_LABELS).map(k=>[k,ED_LABELS[k]]),
+ what:'Кое издание да се инсталира. Ключът по-долу се попълва автоматично с т.нар. generic ключ — той ИЗБИРА изданието, но НЕ активира Windows.',
+ when:'Pro за нормална употреба (пълни функции). Enterprise/LTSC — за корпоративни/дълга поддръжка.',risk:'Ако активацията ти е digital license за конкретно издание, инсталирай СЪЩОТО издание — ще се активира сам онлайн. LTSC ключовете (GVLK) остават неактивирани без KMS сървър.'},
+{id:'productkey',g:'edition',t:'text',lvl:'green',core:1,def:'VK7JG-NPHTM-C97JM-9MPGT-3V66T',label:'Product key (generic)',
+ what:'Ключът, който Setup използва, за да избере изданието. Generic ключовете са публични и легални за инсталация. Активацията става след това.',
+ when:'Празно (издание „Без ключ“) = Setup сам преценява по вградения BIOS лиценз.',risk:'Няма. НЕ слагай тук истинския си ретейл ключ на машини, които ще преинсталираш често — ползвай generic.'},
+{id:'fullname',g:'edition',t:'text',lvl:'green',def:'',label:'Име (регистрация, опционално)',
+ what:'Стойността FullName в системата (видима в системните свойства).',when:'Когато машината е за организация/поръчител.',risk:'Няма.'},
+{id:'organization',g:'edition',t:'text',lvl:'amber',def:'',label:'Организация (опционално)',
+ what:'Стойността Organization в системните свойства.',when:'Корпоративни образи.',risk:'Няма.'},
+
+/* ===== 3. Bypass ===== */
+{id:'bypasshw',g:'bypass',t:'toggle',lvl:'amber',core:1,def:false,label:'Обиколи хардуерните проверки (TPM / Secure Boot / RAM / CPU)',
+ what:'Добавя registry команди по време на Setup (HKLM\\SYSTEM\\Setup\\LabConfig): BypassTPMCheck, BypassSecureBootCheck, BypassRAMCheck, BypassCPUCheck, BypassStorageCheck, BypassDiskCheck. Така Windows 11 се инсталира на PC без TPM 2.0 / Secure Boot / 4GB+ RAM. Проверени като работещи и в 25H2.',
+ when:'Стари/неофициално поддържани машини, тестови VM-и без TPM.',risk:'🟠 Официално неподдържана конфигурация — Microsoft не обещава ъпдейти на такива машини. На практика работят нормално.'},
+{id:'bTpm',g:'bypass',t:'toggle',lvl:'amber',def:false,label:'Bypass само: TPM проверка',showIf:s=>!s.bypasshw,what:'Само BypassTPMCheck.',when:'Хардуер, минаващ всички други изисквания.',risk:'Официално неподдържано.'},
+{id:'bSb',g:'bypass',t:'toggle',lvl:'amber',def:false,label:'Bypass само: Secure Boot',showIf:s=>!s.bypasshw,what:'Само BypassSecureBootCheck.',when:'Стари UEFI без Secure Boot.',risk:'Официално неподдържано.'},
+{id:'bRam',g:'bypass',t:'toggle',lvl:'amber',def:false,label:'Bypass само: RAM (мин. 4GB)',showIf:s=>!s.bypasshw,what:'Само BypassRAMCheck.',when:'Стари/слаби машини или малки VM-и.',risk:'Системата ще работи, но бавно.'},
+{id:'bCpu',g:'bypass',t:'toggle',lvl:'amber',def:false,label:'Bypass само: CPU списък',showIf:s=>!s.bypasshw,what:'Само BypassCPUCheck (процесорът не е в одобрения списък).',when:'Стар процесор, нова дъска.',risk:'Официално неподдържано.'},
+{id:'bStor',g:'bypass',t:'toggle',lvl:'amber',def:false,label:'Bypass само: Storage',showIf:s=>!s.bypasshw,what:'Само BypassStorageCheck.',when:'Малки/бавни дискове.',risk:'Windows се нуждае от ~64GB за нормална работа.'},
+{id:'bDisk',g:'bypass',t:'toggle',lvl:'amber',def:false,label:'Bypass само: Disk (IOPS)',showIf:s=>!s.bypasshw,what:'Само BypassDiskCheck.',when:'СД карта/бавен USB диск.',risk:'Не се препоръчва като системен диск.'},
+{id:'bypassBitLocker',g:'bypass',t:'toggle',lvl:'amber',def:false,label:'Bypass BitLocker проверка (24H2+)',
+ showIf:s=>['24H2','25H2','26H2'].includes(s.targetversion),
+ what:'LabConfig BypassBitLockerCheck. От 24H2 Setup проверява дали устройството може да шифрова автоматично (device encryption) и понякога спира инсталацията.',
+ when:'Машини без TPM или със странни дискови конфигурации.',risk:'Без автоматично шифроване на нови инсталации — за лични машини повечето хора точно това и искат.'},
+{id:'bypassUpgrade',g:'bypass',t:'toggle',lvl:'amber',def:false,label:'Разреши ъпгрейд на неподдържан хардуер',
+ what:'HKLM\\SYSTEM\\Setup\\MoSetup → AllowUpgradesWithUnsupportedTPMOrCPU=1. Позволява инсталация ОТ СЪЩЕСТВУВАЩ Windows на машина, която минава изискванията само частично.',
+ when:'Ъпгрейд „от върха“ на вече работяща (bypass-ната) система.',risk:'Няма за чиста инсталация от флашка.'},
+{id:'bypassNRO',g:'bypass',t:'toggle',lvl:'amber',def:false,label:'BypassNRO ключ (само за по-стари билдове)',
+ what:'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\OOBE → BypassNRO=1. Маха изискването за интернет/MS акаунт в OOBE. От 2025 г. Microsoft премахна скрипта и на нови билдове ключът не действа — затова основният механизъм е локален акаунт през файла (група 5).',
+ when:'Windows 10 или стари билдове на Win11.',risk:'Няма при нови версии — просто не действа.'},
+{id:'networkOOBE',g:'bypass',t:'toggle',lvl:'red',core:1,def:false,label:'🔴 Агресивно: изключи мрежата по време на OOBE',
+ what:'По време на specialize фазата всички мрежови адаптери се ИЗКЛЮЧВАТ (Disable-NetAdapter), а се включват при първия вход. Без интернет OOBE физически не може да изиска MS акаунт — 100% работещ път към локален акаунт при упорити билдове.',
+ when:'Когато въпреки настройките в групи 5–6 машината пак пита за MS акаунт.',risk:'🔴 Няма интернет до първия вход. Твикс-скриптът при първия вход включва адаптерите обратно.'},
+
+/* ===== 4. Дялове ===== */
+{id:'diskmode',g:'disk',t:'select',lvl:'amber',core:1,def:'manual',label:'Къде да се инсталира',
+ opts:[['manual','Ръчно: Setup ще попита за дял (безопасно)'],['auto-uefi','Автоматично на празен диск 0 — UEFI/GPT (ИЗТРИВА диск 0!)'],['auto-bios','Автоматично на празен диск 0 — BIOS/MBR (ИЗТРИВА диск 0!)'],['avail','На първия подходящ дял (InstallToAvailablePartition)']],
+ what:'manual = най-безопасно: инсталацията е автоматична ДО момента на избора на дял. auto-uefi = Setup сам изтрива и създава дяловете (EFI + MSR + Windows) на диск 0. avail = без дефиниция на дялове — Setup ползва първия дял с достатъчно място.',
+ when:'auto-режимите за нови машини/VM-и, когато искаш 100% без докосване.',risk:'🔴 auto-режимите ИЗТРИВАТ ЦЕЛИЯ диск 0 без въпроси! avail може да преформатира съществуващ дял. (Отделен Recovery дял тук не се създава — WinRE живее в C:\\Recovery и работи пълноценно.)'},
+{id:'efisize',g:'disk',t:'select',lvl:'amber',core:1,def:'300',label:'Големина на EFI дяла (MB)',showIf:s=>s.diskmode==='auto-uefi',
+ opts:[['100','100 MB'],['300','300 MB (препоръчително)'],['500','500 MB']],
+ what:'EFI System Partition — зарежда Windows (bootloader). 300 MB дава място за бъдещи firmware/boot ъпдейти.',when:'100 MB стига, но Microsoft препоръчва 300 за Win11.',risk:'По-малко от 100 MB може да блокира бъдещи ъпдейти.'},
+{id:'wipeconfirm',g:'disk',t:'toggle',lvl:'red',core:1,def:false,label:'🔴 Потвърждавам: изтрий ВСИЧКО на диск 0',
+ showIf:s=>s.diskmode==='auto-uefi'||s.diskmode==='auto-bios',
+ what:'Изрично потвърждение, че осъзнаваш изтриването. Без нея генераторът отказва да създаде файла с auto-режим.',when:'Нов диск / VM / машина за преинсталация.',risk:'🔴 Данните НЕ могат да бъдат възстановени.'},
+{id:'diskid',g:'disk',t:'number',lvl:'red',core:1,def:0,label:'DiskID (номер на диска)',showIf:s=>s.diskmode!=='manual',
+ what:'Кой физически диск (0 = първият). Само за много-дискови машини.',when:'Когато искаш инсталация на втори диск.',risk:'🔴 Грешен номер = изтрит грешен диск.'},
+
+/* ===== 5. Потребители — допълнителни (рендер се вижда под списъка с акаунти) ===== */
+{id:'autologon',g:'users',t:'toggle',lvl:'green',core:1,def:true,label:'Автоматичен вход след инсталация',
+ what:'AutoLogon: системата влиза сама с ПЪРВИЯ администратор веднъж след инсталацията — нужно, за да се изпълнят твиксовете и приложенията.',
+ when:'Винаги при твиксове/приложения. Изключи го, ако машината ще ползва друг човек веднага.',risk:'Няма — входът е само веднъж (LogonCount=1).'},
+{id:'plaintext',g:'users',t:'toggle',lvl:'red',def:false,label:'🔴 Запиши паролите като чист текст',
+ what:'Вместо base64 (стандартът на Microsoft за answer файлове) паролите се записват четимо в XML-а. ВАЖНО: base64 НЕ е криптиране — декодира се мигновено. При ДВАТА варианта XML-ът може да се прочете от всеки, до когото стигне файлът.',
+ when:'Само за тестове/дебъг.',risk:'🔴 Който види файла, вижда паролите. Профилите (JSON) и автосъхранението в браузъра също ги пазят в чист вид — не разпространявай профили с реални пароли.'},
+
+/* ===== 6. OOBE и поверителност ===== */
+{id:'hideeula',g:'oobe',t:'toggle',lvl:'green',core:1,def:true,label:'Скрий EULA страницата',
+ what:'HideEULAPage=true — приема лиценза автоматично (AcceptEula се задава в група 2).',when:'Винаги.',risk:'Няма.'},
+{id:'hideoem',g:'oobe',t:'toggle',lvl:'green',core:1,def:true,label:'Скрий OEM регистрационния екран',
+ what:'HideOEMRegistrationScreen=true — маха страницата „Регистрирай това устройство у OEM“.',when:'Винаги.',risk:'Няма.'},
+{id:'hideonline',g:'oobe',t:'toggle',lvl:'green',core:1,def:true,label:'Скрий екраните за Microsoft акаунт',
+ what:'HideOnlineAccountScreens=true — критично поле: OOBE не предлага MS акаунт и преминава към локалния, създаден в група 5.',
+ when:'Винаги при локален акаунт.',risk:'Няма. На най-новите билдове ако въпреки това видиш MS екран — включи и агресивния мрежов режим (група 3).'},
+{id:'hidewireless',g:'oobe',t:'toggle',lvl:'amber',def:false,label:'Скрий Wi-Fi свързването в OOBE',
+ what:'HideWirelessSetupInOOBE=true — не пита за Wi-Fi по време на OOBE.',when:'Настолни PC с кабел; VM-и.',risk:'Ако машината е само Wi-Fi — свързваш се после ръчно.'},
+{id:'protectpc',g:'oobe',t:'select',lvl:'green',core:1,def:'3',label:'ProtectYourPC (privacy preset)',
+ opts:[['3','Минимум: без автоматични „препоръчани“ настройки'],['1','Express: MS препоръчителни настройки (диагностика, реклами...)']],
+ what:'3 = OOBE пропуска „Express settings“ и слага консервативни стойности. 1 = всичко „препоръчително“ от Microsoft.',when:'3 за лични машини.',risk:'Няма — само първоначален preset.'},
+
+/* ===== 7. Компоненти ===== */
+{id:'f_netfx35',g:'features',t:'toggle',lvl:'amber',core:1,def:false,label:'.NET Framework 3.5',
+ what:'Инсталира NetFx3 (старата .NET платформа, нужна на много стари програми). Скриптът първо пробва през Windows Update, после сканира носителя за sources\\sxs.',
+ when:'Стари справочни/индустриални програми, стари игри.',risk:'🟠 Нужен е интернет ИЛИ оригиналната флашка при първия вход.'},
+{id:'f_hyperv',g:'features',t:'toggle',lvl:'amber',def:false,label:'Hyper-V',
+ what:'Enable-WindowsOptionalFeature Microsoft-Hyper-V-All — виртуализация на Windows (Pro/Enterprise/Education; в Home липсва).',
+ when:'Виртуални машини, WSL2 backend, Windows Sandbox.',risk:'🟠 Включва hypervisor — някои античийт системи за игри се държат по-различно.'},
+{id:'f_wsl',g:'features',t:'toggle',lvl:'amber',def:false,label:'WSL 2 (Subsystem for Linux)',
+ what:'Включва Microsoft-Windows-Subsystem-Linux + VirtualMachinePlatform. Дистрибуцията се инсталира после с „wsl --install -d Ubuntu“.',
+ when:'Разработка, Linux инструменти.',risk:'🟠 Изисква виртуализация включена в BIOS.'},
+{id:'f_sandbox',g:'features',t:'toggle',lvl:'amber',def:false,label:'Windows Sandbox',
+ what:'Containers-DisposableClientVM — еднократна, чиста виртуална среда за пробване на съмнителни файлове (Pro+).',
+ when:'Тестване на инсталатори.',risk:'🟠 Изисква виртуализация.'},
+
+/* ===== 9. Debloat и твикс ===== */
+{id:'appsPreset',g:'debloat',t:'select',lvl:'amber',core:1,def:'none',label:'Прединсталирани приложения (debloat preset)',
+ opts:[['none','Не махай нищо'],['light','Лек: Copilot, Teams/Chat, News, Solitaire, Clipchamp, Outlook(new)'],['standard','Стандартен: + Xbox, Zune(Music/TV), Maps, Phone Link, Sticky Notes, Todos, People...'],['aggressive','🔴 Агресивен: остават само Store, Calculator, Photos, Notepad, Terminal, Security']],
+ what:'Маха прединсталираните („inbox“) приложения от всички потребители И от образа за бъдещи профили (provisioned). Пакетите са по име — не пипа системните компоненти.',
+ when:'Чисто начало на нова машина.',risk:'🟠 Махането на Xbox Gaming Overlay може да покаже съобщение при игри. Агресивният може да счупи Store-зависими функции.'},
+{id:'rm_onedrive',g:'debloat',t:'toggle',lvl:'amber',core:1,def:false,label:'Махни OneDrive',
+ what:'Спри процеса и пусни официалните деинсталатори (System32/SysWOW64 OneDriveSetup.exe /uninstall).',
+ when:'Ако НЕ ползваш OneDrive изобщо.',risk:'🟠 Ако синхронизираш документи с OneDrive — НЕ го махай!'},
+{id:'t_telemetry',g:'debloat',t:'toggle',lvl:'amber',def:false,label:'Изключи телеметрия и DiagTrack',
+ what:'Политика AllowTelemetry=0 + спирa/забранява услугите DiagTrack и dmwappushservice; изключва Advertising ID.',
+ when:'Лични машини.',risk:'🟠 На Home политиката не действа пълноценно (Microsoft ограничава политиките в Home).'},
+{id:'t_bing',g:'debloat',t:'toggle',lvl:'green',def:false,label:'Без Bing/уеб в търсенето на Старт',
+ what:'BingSearchEnabled=0 + DisableSearchBoxSuggestions=1 — търсенето търси САМО локално.',when:'Скорост + поверителност.',risk:'Няма.'},
+{id:'t_contextmenu',g:'debloat',t:'toggle',lvl:'green',def:false,label:'Класическо контекстно меню (Win11)',
+ what:'CLSID {86ca1aa0-...} InprocServer32 override — връща пълното дясно копче (без „Show more options“). Explorer се рестартира след твиксовете.',when:'Вкусово.',risk:'Няма; на бъдещи версии MS може да го махне — тогава ключът просто не действа.'},
+{id:'t_explorer',g:'debloat',t:'toggle',lvl:'green',def:false,label:'Explorer: разширения + скрити файлове + This PC',
+ what:'HideFileExt=0 (виждаш .txt/.exe), Hidden=1 (скритите файлове), LaunchTo=1 (Explorer отваря „This PC“).',when:'За технически настроени потребители.',risk:'Няма.'},
+{id:'t_taskbar',g:'debloat',t:'toggle',lvl:'green',def:false,label:'Без Widgets / Chat / Copilot / Task View на taskbar-а',
+ what:'TaskbarDa=0, TaskbarMn=0, ShowCopilotButton=0, ShowTaskViewButton=0 + политика TurnOffWindowsCopilot.',when:'Чист taskbar.',risk:'Няма.'},
+{id:'t_taskbarleft',g:'debloat',t:'toggle',lvl:'green',def:false,label:'Икони на taskbar-а ВЛЯВО (класически вид)',
+ what:'TaskbarAl=0 — иконите се изравняват вляво както в Windows 10 (по подразбиране са в центъра).',when:'Привърженици на стария изглед.',risk:'Няма.'},
+{id:'t_clocksec',g:'debloat',t:'toggle',lvl:'green',def:false,label:'Секунди в часовника',
+ what:'ShowSecondsInSystemClock=1 — часовникът в taskbar-а показва и секунди.',when:'За хора, които гледат точно времето.',risk:'Няма.'},
+{id:'t_gamebar',g:'debloat',t:'toggle',lvl:'amber',def:false,label:'Изключи Game Bar / Game DVR',
+ what:'GameDVR_Enabled=0, AllowGameDVR=0, AppCaptureEnabled=0 — без запис на клипове при Win+G и без фонов запис.',
+ when:'Играни машини без нужда от запис; малко освободена RAM.',risk:'Няма — записът се включва ръчно после.'},
+{id:'t_stickykeys',g:'debloat',t:'toggle',lvl:'green',def:false,label:'Без изскачащ прозорец на Sticky Keys',
+ what:'Accessibility\\StickyKeys Flags=506 — Shift 5 пъти повече не изкарва прозорец.',when:'Геймъри (Shift спам при игри).',risk:'Няма.'},
+{id:'t_ads',g:'debloat',t:'toggle',lvl:'green',def:false,label:'Без съвети, предложения и „тиха инсталация“ на приложения',
+ what:'ContentDeliveryManager: SystemPaneSuggestionsEnabled=0, SilentInstalledAppsEnabled=0 и останалите SubscribedContent ключове = 0.',when:'За чиста машина.',risk:'Няма.'},
+{id:'t_tailored',g:'debloat',t:'toggle',lvl:'green',def:false,label:'Без „персонализирани преживявания“ от диагностичните данни',
+ what:'TailoredExperiencesWithDiagnosticDataEnabled=0 — MS не ползва диагностичните ти данни за персонализирани съвети/реклами.',when:'Поверителност.',risk:'Няма.'},
+{id:'t_activity',g:'debloat',t:'toggle',lvl:'amber',def:false,label:'Изключи History на активността (Timeline)',
+ what:'EnableActivityFeed=0, PublishUserActivities=0, UploadUserActivities=0 — Windows не събира и не качва какво си отварял.',
+ when:'Поверителност.',risk:'Функцията „Продължи от там, където спрях“ между устройства спира.'},
+{id:'t_cortana',g:'debloat',t:'toggle',lvl:'amber',def:false,label:'Изключи Cortana',
+ what:'AllowCortana=0 (политика) — асистентът е изключен на ниво система.',when:'Който не я ползва.',risk:'Няма.'},
+{id:'t_nolockscreen',g:'debloat',t:'toggle',lvl:'amber',def:false,label:'Без lock screen (директно екран за вход)',
+ what:'NoLockScreen=1 — при заключване/съпва минава директно на екрана за вход без картинката между.',
+ when:'Който мрази излишните екрани.',risk:'🟠 На Home може да не действа; на споделени машини изключваш и защитните съобщения на lock screen-а.'},
+{id:'t_hiberboot',g:'debloat',t:'toggle',lvl:'amber',def:false,label:'Без Fast Startup',
+ what:'HiberbootEnabled=0 — при „изключване“ Windows прави ИСТИНСКО изключване (Fast Startup е полу-хибернация и често чупи dual boot/мрежови дискове).',when:'Dual boot системи, NAS потребители.',risk:'Стартиране става леко по-бавно.'},
+{id:'t_hibernate',g:'debloat',t:'toggle',lvl:'amber',def:false,label:'Изключи хибернация (освободи hiberfil.sys)',
+ what:'powercfg /hibernate off — трие hiberfil.sys (до 40% от RAM размера) и изключва и Fast Startup.',when:'Малки SSD-та.',risk:'Загуба на функцията „Hibernate“.'},
+{id:'t_powerplan',g:'debloat',t:'toggle',lvl:'amber',def:false,label:'Power план: High Performance',
+ what:'powercfg /setactive 8c5e7fda-... — процесорът не спи агресивно.',when:'Настолни PC.',risk:'🟠 На лаптоп: по-кратка батерия.'},
+{id:'t_wudefer',g:'debloat',t:'select',lvl:'amber',def:'0',label:'Отложи feature ъпдейтите (Pro+, дни)',
+ opts:[['0','Без отлагане'],['7','7 дни'],['14','14 дни'],['30','30 дни']],
+ what:'Политики WindowsUpdate: DeferFeatureUpdatesPeriodInDays + DeferQualityUpdatesPeriodInDays — новите големи версии не се инсталират веднага (функционалните ъпдейти отлагат до N дни; качествените — 7 фиксирано при избор).',
+ when:'Стабилни работни машини, които не искат ъпгрейд веднага.',risk:'🟠 Политиките работят на Pro+; за 30+ дни и агиър контрол е нужен друг механизъм.'},
+
+/* ===== 10. Драйвери и ъпдейти ===== */
+{id:'drv_usb',g:'drivers',t:'toggle',lvl:'amber',core:1,def:false,label:'Драйвери от папка \\drivers на флашката',
+ what:'При първия вход скриптът сканира всички removable/CD устройства и за всяка папка \\drivers изпълнява pnputil /add-driver ... /subdirs /install.',
+ when:'Машини с мрежова карта без вграден драйвер в Win11 — сложи .inf драйверите там.',risk:'🟠 Инсталирай само драйвери от доверен източник.'},
+{id:'dynupdate',g:'drivers',t:'toggle',lvl:'amber',def:false,label:'Dynamic Update по време на Setup',
+ what:'OSImage → DynamicUpdate Enable=true: Setup тегли последните кумулативни ъпдейти и драйвери от Microsoft ПО ВРЕМЕ на инсталацията.',
+ when:'Когато ISO-ът е стар и не искаш ден ъпдейти след инсталация.',risk:'🟠 Инсталацията вече НЕ е чисто офлайн.'},
+{id:'wustart',g:'drivers',t:'toggle',lvl:'green',def:false,label:'Провери за ъпдейти при първия вход',
+ what:'Стартира Windows Update скан веднага след първия вход.',when:'Винаги полезно.',risk:'Няма.'},
+
+/* ===== 11. Мрежа и домейн ===== */
+{id:'computername',g:'network',t:'text',lvl:'amber',core:1,def:'',label:'Име на компютъра',
+ what:'ComputerName (specialize). До 15 знака, латиница/цифри/тирета (напр. DESK-NIKI). Празно = Windows генерира случайно.',
+ when:'За разпознаване в мрежата / RDP.',risk:'Дублирано име в локална мрежа = объркващи RDP/SMB грешки.'},
+{id:'joinmode',g:'network',t:'select',lvl:'amber',def:'workgroup',label:'Присъединяване',
+ opts:[['workgroup','Workgroup (домашна/офис мрежа без сървър)'],['domain','Domain (AD домейн — фирмена среда)']],
+ what:'workgroup = обикновена мрежа (JoinWorkgroup). domain = присъединяване към Active Directory домейн — тогава попълни полетата по-долу (UnattendedJoin с акаунт на домейна).',
+ when:'За фирмени машини с IT отдел.',risk:'🟠 Грешни данни за домейн = инсталацията може да зagne в specialize; за домейн винаги се съгласувай с IT.'},
+{id:'domainname',g:'network',t:'text',lvl:'red',def:'',label:'Име на домейна',showIf:s=>s.joinmode==='domain',
+ what:'Напр. corp.contoso.com. Setup се присъединява към него при specialize.',when:'Фирмени машини.',risk:'🔴 Полето е чувствително — грешка забива specialize; тествай преди масово внедряване.'},
+{id:'domainuser',g:'network',t:'text',lvl:'red',def:'',label:'Акаунт за домейн (DOMAIN\\user или user@domain)',showIf:s=>s.joinmode==='domain',
+ what:'Акаунт с право да добавя машини в домейна.',when:'Съгласувано с IT.',risk:'Записва се в XML — ползвай временно създаден акаунт.'},
+{id:'domainpass',g:'network',t:'password',lvl:'red',def:'',label:'Парола на домейн акаунта',showIf:s=>s.joinmode==='domain',
+ what:'Паролата за присъединяване.',when:'—',risk:'Записва се в XML (base64). Смени паролата след внедряването.'},
+{id:'domainou',g:'network',t:'text',lvl:'red',def:'',label:'OU път (опционално)',showIf:s=>s.joinmode==='domain',
+ what:'MachineObjectOU, напр. OU=Workstations,DC=corp,DC=contoso,DC=com.',when:'Когато IT иска машината в конкретен OU.',risk:'Няма, ако е валиден.'},
+{id:'networklocation',g:'network',t:'select',lvl:'amber',def:'',label:'NetworkLocation (Home/Work/Public)',
+ opts:[['','(пропусни)'],['Home','Home'],['Work','Work'],['Public','Public']],
+ what:'NLA категория на мрежата при първото свързване. В съвременните Win11 версии често се игнорира — оставено за съвместимост.',when:'—',risk:'Няма.'}
+];
+
+/* ---------- състояние ---------- */
+const LS_KEY='winsetup-studio-state-v2';
+let S_st={};
+function makeDefaultAccounts(){return [{name:'',display:'',password:'',admin:true,desc:''}]}
+const defaults={};
+S.forEach(x=>defaults[x.id]=x.def);
+defaults.accounts=makeDefaultAccounts();
+defaults.appsMap={};
+defaults.wingetapps='';
+function loadState(){
+  S_st=Object.assign({},defaults);
+  S_st.accounts=makeDefaultAccounts();
+  S_st.appsMap={};
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw){/* миграция от v1 */}
+    const o=raw?JSON.parse(raw):null;
+    if(o&&o.accounts&&Array.isArray(o.accounts)){S_st.accounts=o.accounts}
+    else if(o&&o.username!==undefined){ /* v1 → v2 миграция */
+      S_st.accounts=[{name:o.username||'',display:o.displayname||'',password:o.userpassword||'',admin:o.useradmin!==false,desc:o.userdesc||''}];
+    }
+    if(o&&o.appsMap)S_st.appsMap=o.appsMap;
+    if(o)for(const k in o){if(k in S_st&&k!=='accounts'&&k!=='appsMap')S_st[k]=o[k]}
+    if(o&&o.__keyManual!==undefined)S_st.__keyManual=o.__keyManual;
+  }catch(e){}
+  if(typeof S_st.__keyManual==='undefined')S_st.__keyManual=false;
+}
+function saveState(){try{localStorage.setItem(LS_KEY,JSON.stringify(S_st))}catch(e){}}
+function val(id){return S_st[id]}
+
+/* ---------- рендер на каталога ---------- */
+function visible(s){return !s.showIf||s.showIf(S_st)}
+function baseVisible(s){return visible(s)&&(s.lvl==='green'||s.core)}
+function matches(s,q){if(!q)return true;const t=(s.label+' '+(s.what||'')+' '+(s.when||'')+' '+s.id).toLowerCase();return t.includes(q)}
+
+function controlHTML(s){
+  const v=S_st[s.id];
+  if(s.t==='toggle')return `<label class="sw"><input type="checkbox" data-id="${s.id}" ${v?'checked':''}><i></i></label>`;
+  if(s.t==='select'){const o=s.opts.map(o=>`<option value="${esc(o[0])}" ${String(v)===String(o[0])?'selected':''}>${esc(o[1])}</option>`).join('');return `<select data-id="${s.id}">${o}</select>`}
+  if(s.t==='password')return `<input type="password" data-id="${s.id}" value="${esc(v)}" autocomplete="off">`;
+  if(s.t==='number')return `<input type="number" data-id="${s.id}" value="${esc(v)}" min="0" style="min-width:90px">`;
+  if(s.t==='note')return '';
+  return `<input type="text" data-id="${s.id}" value="${esc(v)}">`;
+}
+function warnHTML(s){
+  const w=s.warn&&s.warn(S_st);
+  if(!w)return '';
+  const red=w[0]==='!';
+  return `<div class="wbox ${red?'red':'amber'}">${red?w.slice(1):w}</div>`;
+}
+function cardHTML(s){
+  if(s.t==='note')return `<div class="note" data-card="${s.id}"><b>${esc(s.label)}</b> — ${esc(s.what)}</div>`;
+  const pill=s.lvl==='green'?'БАЗОВА':s.lvl==='amber'?'РАЗШИРЕНА':'ОПАСНА';
+  return `<div class="card lv-${s.lvl}" data-card="${s.id}">
+    <div class="row">
+      <span class="dot"></span>
+      <span class="lbl">${esc(s.label)}<span class="pill p-${s.lvl}">${pill}</span></span>
+      ${controlHTML(s)}
+    </div>
+    ${warnHTML(s)}
+    ${s.what?`<details class="more"><summary>Какво е това? Подробно обяснение</summary><div class="body">
+      <p><b>Какво прави:</b> ${esc(s.what)}</p>
+      ${s.when?`<p><b>Кога го искаш:</b> ${esc(s.when)}</p>`:''}
+      ${s.risk?`<p><b>Риск / бележки:</b> ${esc(s.risk)}</p>`:''}
+    </div></details>`:''}
+  </div>`;
+}
+/* --- акаунти (група 5) --- */
+function accountsHTML(){
+  let h='<div class="grouph" id="sec-users"><h2>👤 5. Потребители</h2><span class="gdesc">Акаунти, пароли, автологин</span></div>';
+  h+='<div class="note">Създадените тук <b>локални акаунти се записват директно във файла</b> — OOBE не пита нищо и НЕ иска Microsoft акаунт. AutoLogon влиза с първия администратор веднъж, за да изпълни твиксовете.</div>';
+  S_st.accounts.forEach((a,i)=>{
+    h+=`<div class="accrow" data-acc="${i}">
+      <div class="row" style="margin-bottom:8px">
+        <span class="pill p-${a.admin?'green':'amber'}">${a.admin?'АДМИНИСТРАТОР':'СТАНДАРТЕН'}</span>
+        ${S_st.accounts.length>1?`<button class="del" data-accdel="${i}">✕ Махни</button>`:''}
+      </div>
+      <div class="row">
+        <div><label>Потребителско име (латиница, без интервали)</label><input data-accf="name" data-acci="${i}" value="${esc(a.name)}" placeholder="niki5"></div>
+        <div><label>Видимо име (може кирилица)</label><input data-accf="display" data-acci="${i}" value="${esc(a.display)}" placeholder="Николай"></div>
+        <div><label>Парола</label><span style="display:flex;gap:4px"><input type="password" data-accf="password" data-acci="${i}" value="${esc(a.password)}" autocomplete="off" style="min-width:150px"><button class="eye" data-eye="1" title="Покажи/скрий паролата">👁</button></span></div>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <label class="sw" style="margin-top:4px"><input type="checkbox" data-accf="admin" data-acci="${i}" ${a.admin?'checked':''}><i></i></label>
+        <span style="font-size:12.5px">Администраторски права</span>
+        <div style="flex:1;min-width:180px"><label>Описание (опционално)</label><input data-accf="desc" data-acci="${i}" value="${esc(a.desc)}" style="width:100%" placeholder="личен акаунт"></div>
+      </div>
+    </div>`;
+  });
+  h+=`<button class="addacc" id="addAcc">＋ Добави още акаунт (напр. стандартен за дете/колега)</button>`;
+  h+=S.filter(x=>x.g==='users'&&visible(x)&&baseVisible(x)).map(cardHTML).join('');
+  return h;
+}
+/* --- приложения (група 8) --- */
+function appsHTML(){
+  let h='<div class="grouph" id="sec-apps"><h2>📦 8. Приложения</h2><span class="gdesc">Авто-инсталация при първия вход (каталог + winget)</span></div>';
+  h+='<div class="note">Отметнатите се инсталират <b>автоматично при първия вход</b> през winget (тихо, с приемане на лицензи). Работи като авто-скрипт тип „Крис Титус“, но олекотено: избираш само това, което ти трябва. Нужен е интернет при първия вход.</div>';
+  APPCATALOG.forEach(cat=>{
+    h+=`<div class="appcat">${esc(cat.cat)}</div>`;
+    cat.items.forEach(it=>{
+      const on=!!S_st.appsMap[it.id];
+      h+=`<div class="appitem">
+        <span class="dot" style="background:${on?'var(--green)':'var(--mut)'}"></span>
+        <span class="lbl">${esc(it.n)} <span class="pill p-green">winget</span></span>
+        <span class="wid">${esc(it.id)}</span>
+        <span class="hint" style="flex:2;min-width:160px">${esc(it.h)}</span>
+        <label class="sw"><input type="checkbox" data-app="${esc(it.id)}" ${on?'checked':''}><i></i></label>
+      </div>`;
+    });
+  });
+  h+=`<div class="card lv-amber" style="margin-top:12px">
+    <div class="row">
+      <span class="dot" style="background:var(--amber)"></span>
+      <span class="lbl">Допълнителни winget ID-та (запетайки)<span class="pill p-amber">РАЗШИРЕНА</span></span>
+      <input type="text" data-id="wingetapps" value="${esc(S_st.wingetapps||'')}" placeholder="напр. 7zip.7zip, VideoLAN.VLC" style="flex:1;min-width:240px">
+    </div>
+    <details class="more"><summary>Какво е това? Подробно обяснение</summary><div class="body">
+      <p><b>Какво прави:</b> Прилага се към списъка от отметки — при първия вход скриптът изпълнява <b>winget install --id &lt;ID&gt;</b> за всеки (тихо, с приемане на лицензи).</p>
+      <p><b>Кога го искаш:</b> Програма, която я няма в каталога. Търси ID с командата „winget search име“.</p>
+      <p><b>Риск / бележки:</b> 🟠 Нужен е интернет при първия вход. Грешни ID-та просто се пропускат с лог.</p>
+    </div></details>
+  </div>`;
+  return h;
+}
+function renderContent(){
+  const q=$('q').value.trim().toLowerCase();
+  const base=!!$('vwBase').classList.contains('on');
+  let html='',totalVis=0;
+  GROUPS.forEach(g=>{
+    if(g.id==='users'){
+      if(!q||'акаунт акаунти потребител потребители парола пароли autologon вход admin'.includes(q)){
+        html+=accountsHTML();totalVis+=S_st.accounts.length;
+      }
+      return;
+    }
+    if(g.id==='apps'){
+      const hay='8. Приложения приложения apps winget програми инсталация софтуер';
+      const appHit=APPCATALOG.some(c=>c.items.some(i=>(i.n+' '+i.id+' '+i.h).toLowerCase().includes(q)));
+      if(!q||hay.includes(q)||appHit){
+        html+=appsHTML();totalVis+=APPCATALOG.reduce((n,c)=>n+c.items.length,0);
+      }
+      return;
+    }
+    const items=S.filter(x=>x.g===g.id&&(!base||baseVisible(x))&&matches(x,q)&&visible(x));
+    if(!items.length)return;
+    totalVis+=items.length;
+    const changed=S.filter(x=>x.g===g.id&&JSON.stringify(S_st[x.id])!==JSON.stringify(defaults[x.id])).length;
+    html+=`<div class="grouph" id="sec-${g.id}"><h2>${g.ic} ${esc(g.title)}</h2><span class="gdesc">${esc(g.desc)}</span>${changed?`<span class="badge" style="color:var(--blue)">променени: ${changed}</span>`:''}</div>`;
+    html+=items.map(cardHTML).join('');
+  });
+  if(!html)html='<div class="note">Няма настройки, отговарящи на търсенето.</div>';
+  $('content').innerHTML=html;
+  $('countInfo').textContent=`${totalVis} видими настройки · ${S.length+APPCATALOG.reduce((n,c)=>n+c.items.length,0)} общо в ${GROUPS.length} групи`;
+  updateNavCounts();updateProgress();
+}
+function renderNav(){
+  $('gnav').innerHTML=GROUPS.map(g=>`<a class="grp" data-g="${g.id}" onclick="document.getElementById('sec-'+this.dataset.g).scrollIntoView({behavior:'smooth'})"><span class="ic">${g.ic}</span><span>${esc(g.title)}</span><span class="cnt">0</span></a>`).join('');
+}
+function updateNavCounts(){
+  document.querySelectorAll('#gnav .grp').forEach(el=>{
+    const gid=el.dataset.g;
+    let changed=0;
+    if(gid==='users'){changed=(JSON.stringify(S_st.accounts)!==JSON.stringify(makeDefaultAccounts()))?1:0}
+    else if(gid==='apps'){changed=Object.values(S_st.appsMap).filter(Boolean).length}
+    else changed=S.filter(x=>x.g===gid&&JSON.stringify(S_st[x.id])!==JSON.stringify(defaults[x.id])).length;
+    const c=el.querySelector('.cnt');c.textContent=changed;c.classList.toggle('act',changed>0);
+  });
+}
+function updateProgress(){
+  let total=S.length+APPCATALOG.reduce((n,c)=>n+c.items.length,0)+1;
+  let done=0;
+  S.forEach(x=>{if(JSON.stringify(S_st[x.id])!==JSON.stringify(defaults[x.id]))done++});
+  done+=Object.values(S_st.appsMap).filter(Boolean).length;
+  if(JSON.stringify(S_st.accounts)!==JSON.stringify(makeDefaultAccounts()))done++;
+  const p=total?Math.round(done/total*100):0;
+  $('pbar').style.width=p+'%';
+}
+
+/* ---------- промени по полета ---------- */
+function bindEvents(){
+  $('content').addEventListener('change',e=>{
+    const t=e.target;
+    if(t.dataset.accf!==undefined){
+      const i=+t.dataset.acci,f=t.dataset.accf;
+      S_st.accounts[i][f]=(f==='admin')?t.checked:t.value;
+      afterChange();return;
+    }
+    if(t.dataset.app!==undefined){
+      if(t.checked)S_st.appsMap[t.dataset.app]=true;else delete S_st.appsMap[t.dataset.app];
+      afterChange();return;
+    }
+    const id=t.dataset&&t.dataset.id;if(!id)return;
+    let v;
+    if(t.type==='checkbox')v=t.checked;
+    else if(t.type==='number')v=(t.value===''?'':Number(t.value));
+    else v=t.value;
+    S_st[id]=v;
+    if(id==='uilanguage'){const l=LOCALES[v];if(l){S_st.inputlocale=l;S_st.userlocale=v;S_st.systemlocale=v}}
+    if(id==='edition'&&String(v)!=='auto'&&!S_st.__keyManual){S_st.productkey=KEYS[v]||''}
+    if(id==='productkey'){S_st.__keyManual=(String(v)!==(KEYS[S_st.edition]||''))}
+    afterChange();
+  });
+  $('content').addEventListener('click',e=>{
+    if(e.target.id==='addAcc'){S_st.accounts.push({name:'',display:'',password:'',admin:false,desc:''});afterChange();return}
+    if(e.target.dataset&&e.target.dataset.eye!==undefined){
+      const inp=e.target.parentElement.querySelector('input');
+      if(inp)inp.type=(inp.type==='password')?'text':'password';
+      return;
+    }
+    const del=e.target.dataset&&e.target.dataset.accdel;
+    if(del!==undefined&&del!==''){S_st.accounts.splice(+del,1);afterChange()}
+  });
+  $('content').addEventListener('input',e=>{
+    const t=e.target;
+    if(t.dataset.accf!==undefined){
+      const i=+t.dataset.acci,f=t.dataset.accf;
+      S_st.accounts[i][f]=t.value;scheduleSave();schedulePreview();return;
+    }
+    const id=t.dataset&&t.dataset.id;if(!id)return;
+    S_st[id]=t.value;
+    if(id==='productkey'){S_st.__keyManual=(String(t.value)!==(KEYS[S_st.edition]||''))}
+    scheduleSave();schedulePreview();
+  });
+  $('q').addEventListener('input',()=>renderContent());
+  $('vwBase').onclick=()=>{$('vwBase').classList.add('on');$('vwFull').classList.remove('on');renderContent()};
+  $('vwFull').onclick=()=>{$('vwFull').classList.add('on');$('vwBase').classList.remove('on');renderContent()};
+  /* scrollspy */
+  window.addEventListener('scroll',()=>{
+    let act=null;
+    GROUPS.forEach(g=>{const el=$('sec-'+g.id);if(el&&el.getBoundingClientRect().top<160)act=g.id});
+    document.querySelectorAll('#gnav .grp').forEach(el=>el.classList.toggle('active',el.dataset.g===act));
+  },{passive:true});
+  /* drag & drop профил */
+  document.addEventListener('dragover',e=>{e.preventDefault();document.body.classList.add('dropping')});
+  document.addEventListener('dragleave',e=>{if(!e.relatedTarget)document.body.classList.remove('dropping')});
+  document.addEventListener('drop',e=>{
+    e.preventDefault();document.body.classList.remove('dropping');
+    const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];
+    if(!f||!/\.json$/i.test(f.name)){if(f)toast('Трябва .json файл (профил).');return}
+    const r=new FileReader();
+    r.onload=()=>{importProfileText(r.result,f.name)};
+    r.readAsText(f,'utf-8');
+  });
+}
+let _sv,_pv;
+function scheduleSave(){clearTimeout(_sv);_sv=setTimeout(()=>{saveState();updateNavCounts();updateProgress()},250)}
+function schedulePreview(){clearTimeout(_pv);_pv=setTimeout(()=>{updatePreview();updateSummary()},250)}
+function afterChange(){saveState();renderContent();updatePreview();updateSummary()}
+
+/* ================================================================
+   ГЕНЕРАТОР на autounattend.xml
+   ================================================================ */
+function comp(name,inner,arch){
+  arch=arch||'amd64';
+  return `      <component name="${name}" processorArchitecture="${arch}" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n${inner}\n      </component>`;
+}
+function pass(name,comps){
+  comps=(comps||[]).filter(Boolean);
+  if(!comps.length)return `  <settings pass="${name}"/>`;
+  return `  <settings pass="${name}">\n${comps.join('\n')}\n  </settings>`;
+}
+function runSync(cmds){
+  if(!cmds.length)return '';
+  const body=cmds.map((c,i)=>`        <RunSynchronousCommand wcm:action="add">\n          <Order>${i+1}</Order>\n          <Description>${esc(c.d)}</Description>\n          <Path>${esc(c.p)}</Path>\n        </RunSynchronousCommand>`).join('\n');
+  return `        <RunSynchronous>\n${body}\n        </RunSynchronous>`;
+}
+
+function selectedApps(){
+  const ids=Object.keys(S_st.appsMap).filter(k=>S_st.appsMap[k]);
+  const custom=String(val('wingetapps')||'').split(/[;,]/).map(x=>x.trim()).filter(Boolean);
+  return [...new Set(ids.concat(custom))];
+}
+function primaryAccount(){
+  const named=(S_st.accounts||[]).filter(a=>a&&a.name);
+  return named.find(a=>a.admin)||named[0]||null;
+}
+
+function buildTweaksScript(){
+  const P=[];
+  P.push("$ErrorActionPreference='Continue'");
+  P.push("$L=\"$env:WINDIR\\Temp\\WinSetupStudio.log\"");
+  P.push("function W([string]$m){try{Add-Content -Path $L -Value (\"{0} {1}\" -f (Get-Date -Format s),$m) -ErrorAction SilentlyContinue}catch{}}");
+  P.push("function Sec([string]$n,[scriptblock]$sb){try{& $sb; W \"OK $n\"}catch{W (\"ERR {0}: {1}\" -f $n, $_.Exception.Message)}}");
+  P.push("W '=== WinSetup Studio tweaks START ==='");
+  if(val('networkOOBE'))P.push("Sec 'net-enable' { Get-NetAdapter | Enable-NetAdapter -Confirm:$false }");
+  if(val('drv_usb'))P.push("Sec 'drivers-usb' { Get-Volume | Where-Object { $_.DriveType -in 'Removable','CD-ROM' } | ForEach-Object { $p=\"$($_.DriveLetter):\\drivers\"; if(Test-Path $p){ W \"Installing drivers from $p\"; & pnputil /add-driver \"$p\\*.inf\" /subdirs /install | Out-Null } } }");
+  if(val('f_netfx35'))P.push("Sec 'netfx3' { $ok=$false; try{ & dism /online /enable-feature /featurename:NetFx3 /All /NoRestart | Out-Null; $ok=($LASTEXITCODE -eq 0) }catch{}; if(-not $ok){ Get-Volume | Where-Object { $_.DriveType -in 'Removable','CD-ROM' } | ForEach-Object { $s=\"$($_.DriveLetter):\\sources\\sxs\"; if(Test-Path $s){ & dism /online /enable-feature /featurename:NetFx3 /All /LimitAccess /Source:$s /NoRestart | Out-Null } } } }");
+  if(val('f_hyperv'))P.push("Sec 'hyperv' { Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -NoRestart | Out-Null }");
+  if(val('f_wsl'))P.push("Sec 'wsl' { & dism /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /NoRestart | Out-Null; & dism /online /enable-feature /featurename:VirtualMachinePlatform /NoRestart | Out-Null }");
+  if(val('f_sandbox'))P.push("Sec 'sandbox' { Enable-WindowsOptionalFeature -Online -FeatureName Containers-DisposableClientVM -NoRestart | Out-Null }");
+  const apps=selectedApps();
+  if(apps.length){
+    const ids=apps.map(x=>`'${x.replace(/'/g,"''")}'`).join(',');
+    P.push(`Sec 'winget' { Start-Sleep 10; foreach($i in @(${ids})){ W \"winget $i\"; & winget install --id $i --silent --accept-package-agreements --accept-source-agreements | Out-Null } }`);
+  }
+  const APP_LIGHT=['Microsoft.Copilot','MSTeams','MicrosoftTeams','Microsoft.News','Microsoft.SolitaireCollection','Clipchamp.Clipchamp','Microsoft.OutlookForWindows','Microsoft.BingNews','Microsoft.BingWeather','Microsoft.BingSearch','Microsoft.GetHelp','Microsoft.Getstarted','Microsoft.MicrosoftOfficeHub'];
+  const APP_MORE=['Microsoft.GamingApp','Microsoft.XboxApp','Microsoft.XboxGamingOverlay','Microsoft.XboxIdentityProvider','Microsoft.XboxSpeechToTextOverlay','Microsoft.ZuneMusic','Microsoft.ZuneVideo','Microsoft.WindowsMaps','Microsoft.YourPhone','Microsoft.WindowsFeedbackHub','Microsoft.MicrosoftStickyNotes','Microsoft.ToDo','Microsoft.People','Microsoft.PowerAutomateDesktop','Microsoft.MixedReality.Portal','Microsoft.SkypeApp','Microsoft.Wallet','Microsoft.WindowsAlarms','Microsoft.WindowsSoundRecorder','Microsoft.549981C3F5F10'];
+  const APP_KEEP=['Microsoft.WindowsStore','Microsoft.WindowsCalculator','Microsoft.WindowsPhotos','Microsoft.WindowsNotepad','Microsoft.WindowsTerminal','Microsoft.DesktopAppInstaller','Microsoft.WindowsSecHealthUI','Microsoft.HEIFImageExtension','Microsoft.WebpImageExtension','Microsoft.VP9VideoExtensions','Microsoft.AV1VideoExtension','Microsoft.WebMediaExtensions','Microsoft.RawImageExtension','Microsoft.HEVCVideoExtension'];
+  if(val('appsPreset')==='light'||val('appsPreset')==='standard'){
+    const list=(val('appsPreset')==='light'?APP_LIGHT:APP_LIGHT.concat(APP_MORE)).map(x=>`'${x}'`).join(',');
+    P.push(`Sec 'debloat-apps' { $pkgs=@(${list}); foreach($p in $pkgs){ Get-AppxPackage -AllUsers -Name $p -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue; Get-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue | Where-Object DisplayName -eq $p | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue } }`);
+  }
+  if(val('appsPreset')==='aggressive'){
+    const keep=APP_KEEP.map(x=>`'${x}'`).join(',');
+    P.push(`Sec 'debloat-apps-agg' { $keep=@(${keep}); Get-AppxPackage -AllUsers | Where-Object { -not $_.IsFramework -and ($keep -notcontains $_.Name) } | ForEach-Object { W \"remove $($_.Name)\"; Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue }; Get-AppxProvisionedPackage -Online | Where-Object { $keep -notcontains $_.DisplayName } | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue }`);
+  }
+  if(val('rm_onedrive'))P.push("Sec 'onedrive' { Stop-Process -Name OneDrive -Force -ErrorAction SilentlyContinue; foreach($p in \"$env:WINDIR\\System32\\OneDriveSetup.exe\",\"$env:WINDIR\\SysWOW64\\OneDriveSetup.exe\"){ if(Test-Path $p){ & $p /uninstall | Out-Null } } }");
+  if(val('t_telemetry'))P.push("Sec 'telemetry' { reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection\" /v AllowTelemetry /t REG_DWORD /d 0 /f | Out-Null; foreach($s in 'DiagTrack','dmwappushservice'){ Set-Service $s -StartupType Disabled -ErrorAction SilentlyContinue; Stop-Service $s -Force -ErrorAction SilentlyContinue }; reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo\" /v Enabled /t REG_DWORD /d 0 /f | Out-Null }");
+  if(val('t_bing'))P.push("Sec 'bing' { reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Search\" /v BingSearchEnabled /t REG_DWORD /d 0 /f | Out-Null; reg add \"HKCU\\Software\\Policies\\Microsoft\\Windows\\Explorer\" /v DisableSearchBoxSuggestions /t REG_DWORD /d 1 /f | Out-Null }");
+  if(val('t_contextmenu'))P.push("Sec 'context-menu' { New-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32' -Force | Out-Null }");
+  if(val('t_explorer'))P.push("Sec 'explorer' { reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" /v HideFileExt /t REG_DWORD /d 0 /f | Out-Null; reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" /v Hidden /t REG_DWORD /d 1 /f | Out-Null; reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\" /v LaunchTo /t REG_DWORD /d 1 /f | Out-Null }");
+  if(val('t_taskbar'))P.push("Sec 'taskbar' { reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" /v TaskbarDa /t REG_DWORD /d 0 /f | Out-Null; reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" /v TaskbarMn /t REG_DWORD /d 0 /f | Out-Null; reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" /v ShowCopilotButton /t REG_DWORD /d 0 /f | Out-Null; reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" /v ShowTaskViewButton /t REG_DWORD /d 0 /f | Out-Null; reg add \"HKCU\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot\" /v TurnOffWindowsCopilot /t REG_DWORD /d 1 /f | Out-Null }");
+  if(val('t_taskbarleft'))P.push("Sec 'taskbar-left' { reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" /v TaskbarAl /t REG_DWORD /d 0 /f | Out-Null }");
+  if(val('t_clocksec'))P.push("Sec 'clock-seconds' { reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\" /v ShowSecondsInSystemClock /t REG_DWORD /d 1 /f | Out-Null }");
+  if(val('t_gamebar'))P.push("Sec 'gamebar' { reg add \"HKCU\\System\\GameConfigStore\" /v GameDVR_Enabled /t REG_DWORD /d 0 /f | Out-Null; reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR\" /v AppCaptureEnabled /t REG_DWORD /d 0 /f | Out-Null; reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR\" /v AllowGameDVR /t REG_DWORD /d 0 /f | Out-Null }");
+  if(val('t_stickykeys'))P.push("Sec 'sticky-keys' { reg add \"HKCU\\Control Panel\\Accessibility\\StickyKeys\" /v Flags /t REG_SZ /d 506 /f | Out-Null }");
+  if(val('t_ads'))P.push("Sec 'ads' { $cdm='HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager'; foreach($v in 'SystemPaneSuggestionsEnabled','SilentInstalledAppsEnabled','SubscribedContent-338387Enabled','SubscribedContent-338388Enabled','SubscribedContent-338389Enabled','SubscribedContent-310093Enabled','SubscribedContent-338393Enabled','SubscribedContent-353698Enabled'){ Set-ItemProperty -Path $cdm -Name $v -Value 0 -Type DWord -ErrorAction SilentlyContinue } }");
+  if(val('t_tailored'))P.push("Sec 'tailored' { reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy\" /v TailoredExperiencesWithDiagnosticDataEnabled /t REG_DWORD /d 0 /f | Out-Null }");
+  if(val('t_activity'))P.push("Sec 'activity' { reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System\" /v EnableActivityFeed /t REG_DWORD /d 0 /f | Out-Null; reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System\" /v PublishUserActivities /t REG_DWORD /d 0 /f | Out-Null; reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System\" /v UploadUserActivities /t REG_DWORD /d 0 /f | Out-Null }");
+  if(val('t_cortana'))P.push("Sec 'cortana' { reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search\" /v AllowCortana /t REG_DWORD /d 0 /f | Out-Null }");
+  if(val('t_nolockscreen'))P.push("Sec 'no-lockscreen' { reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization\" /v NoLockScreen /t REG_DWORD /d 1 /f | Out-Null }");
+  if(val('t_hiberboot'))P.push("Sec 'hiberboot' { reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power\" /v HiberbootEnabled /t REG_DWORD /d 0 /f | Out-Null }");
+  if(val('t_hibernate'))P.push("Sec 'hibernate' { & powercfg /hibernate off | Out-Null }");
+  if(val('t_powerplan'))P.push("Sec 'powerplan' { & powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c | Out-Null }");
+  const defer=String(val('t_wudefer')||'0');
+  if(defer!=='0')P.push(`Sec 'wu-defer' { reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\" /v DeferFeatureUpdatesPeriodInDays /t REG_DWORD /d ${defer} /f | Out-Null; reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\" /v DeferQualityUpdatesPeriodInDays /t REG_DWORD /d 7 /f | Out-Null }`);
+  if(val('wustart'))P.push("Sec 'wu-scan' { try { (New-Object -ComObject Microsoft.Update.AutoUpdate).DetectNow() } catch { & usoclient StartInteractiveScan } }");
+  if(P.length>5){
+    const shellTweaks=val('t_contextmenu')||val('t_taskbar')||val('t_taskbarleft')||val('t_explorer');
+    if(shellTweaks)P.push("Sec 'restart-explorer' { Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue }");
+    P.push("W '=== WinSetup Studio tweaks END ==='");
+    return P.join("\n");
+  }
+  return '';
+}
+
+function buildXML(){
+  const ui=val('uilanguage'),inp=val('inputlocale')||LOCALES[ui],ul=val('userlocale')||ui,sl=val('systemlocale')||ui;
+  const tz=val('timezone'),key=String(val('productkey')||'').trim(),ed=val('edition');
+  const pt=val('plaintext');
+  const accs=(S_st.accounts||[]).filter(a=>a&&a.name);
+  const tweaks=buildTweaksScript();
+
+  /* --- windowsPE --- */
+  const peIntl=comp('Microsoft-Windows-International-Core-WinPE',
+`        <SetupUILanguage>
+          <UILanguage>${esc(ui)}</UILanguage>
+        </SetupUILanguage>
+        <InputLocale>${esc(inp)}</InputLocale>
+        <SystemLocale>${esc(sl)}</SystemLocale>
+        <UILanguage>${esc(ui)}</UILanguage>
+        <UserLocale>${esc(ul)}</UserLocale>`);
+
+  let setup='';
+  const uefi=val('diskmode')==='auto-uefi',bios=val('diskmode')==='auto-bios';
+  const wipe=uefi||bios;
+  if(wipe){
+    const did=Number(val('diskid')||0);
+    const efiSz=val('efisize')||'300';
+    let create,modify;
+    if(uefi){
+      create=`          <CreatePartitions>
+            <CreatePartition wcm:action="add"><Order>1</Order><Type>EFI</Type><Size>${esc(efiSz)}</Size></CreatePartition>
+            <CreatePartition wcm:action="add"><Order>2</Order><Type>MSR</Type><Size>16</Size></CreatePartition>
+            <CreatePartition wcm:action="add"><Order>3</Order><Type>Primary</Type><Extend>true</Extend></CreatePartition>
+          </CreatePartitions>`;
+      modify=`          <ModifyPartitions>
+            <ModifyPartition wcm:action="add"><Order>1</Order><PartitionID>1</PartitionID><Format>FAT32</Format><Label>System</Label></ModifyPartition>
+            <ModifyPartition wcm:action="add"><Order>2</Order><PartitionID>3</PartitionID><Format>NTFS</Format><Label>Windows</Label><Letter>C</Letter></ModifyPartition>
+          </ModifyPartitions>`;
+    }else{
+      create=`          <CreatePartitions>
+            <CreatePartition wcm:action="add"><Order>1</Order><Type>Primary</Type><Size>100</Size></CreatePartition>
+            <CreatePartition wcm:action="add"><Order>2</Order><Type>Primary</Type><Extend>true</Extend></CreatePartition>
+          </CreatePartitions>`;
+      modify=`          <ModifyPartitions>
+            <ModifyPartition wcm:action="add"><Order>1</Order><PartitionID>1</PartitionID><Format>NTFS</Format><Label>System Reserved</Label><Active>true</Active></ModifyPartition>
+            <ModifyPartition wcm:action="add"><Order>2</Order><PartitionID>2</PartitionID><Format>NTFS</Format><Label>Windows</Label><Letter>C</Letter></ModifyPartition>
+          </ModifyPartitions>`;
+    }
+    setup+=`        <DiskConfiguration>
+        <Disk wcm:action="add">
+${create}
+${modify}
+          <DiskID>${did}</DiskID>
+          <WillWipeDisk>true</WillWipeDisk>
+        </Disk>
+        </DiskConfiguration>\n`;
+    setup+=`        <ImageInstall>
+          <OSImage>
+            <InstallTo><DiskID>${did}</DiskID><PartitionID>${uefi?3:2}</PartitionID></InstallTo>
+            <InstallToAvailablePartition>false</InstallToAvailablePartition>
+            <WillShowUI>OnError</WillShowUI>
+${val('dynupdate')?'            <DynamicUpdate><Enable>true</Enable><WillShowUI>OnError</WillShowUI></DynamicUpdate>\n':''}          </OSImage>
+        </ImageInstall>\n`;
+  }else if(val('diskmode')==='avail'){
+    setup+=`        <ImageInstall>
+          <OSImage>
+            <InstallToAvailablePartition>true</InstallToAvailablePartition>
+${val('dynupdate')?'            <DynamicUpdate><Enable>true</Enable><WillShowUI>OnError</WillShowUI></DynamicUpdate>\n':''}          </OSImage>
+        </ImageInstall>\n`;
+  }else if(val('dynupdate')){
+    setup+=`        <ImageInstall>
+          <OSImage>
+            <DynamicUpdate><Enable>true</Enable><WillShowUI>OnError</WillShowUI></DynamicUpdate>
+          </OSImage>
+        </ImageInstall>\n`;
+  }
+  let ud='        <UserData>\n';
+  /* ред по схемата: AcceptEula → FullName → Organization → ProductKey */
+  ud+='          <AcceptEula>true</AcceptEula>\n';
+  if(val('fullname'))ud+=`          <FullName>${esc(val('fullname'))}</FullName>\n`;
+  if(val('organization'))ud+=`          <Organization>${esc(val('organization'))}</Organization>\n`;
+  if(ed!=='auto'&&key)ud+=`          <ProductKey><Key>${esc(key)}</Key><WillShowUI>OnError</WillShowUI></ProductKey>\n`;
+  ud+='        </UserData>\n';
+  setup+=ud;
+  const cmds=[];
+  const lab=[
+    ['BypassTPMCheck','TPM'],['BypassSecureBootCheck','Secure Boot'],['BypassRAMCheck','RAM'],
+    ['BypassCPUCheck','CPU'],['BypassStorageCheck','Storage'],['BypassDiskCheck','Disk']];
+  const active=val('bypasshw')?lab:lab.filter((x,i)=>val(['bTpm','bSb','bRam','bCpu','bStor','bDisk'][i]));
+  active.forEach(x=>cmds.push({d:'Bypass hardware check: '+x[1],p:`reg.exe add "HKLM\\SYSTEM\\Setup\\LabConfig" /v ${x[0]} /t REG_DWORD /d 1 /f`}));
+  if(val('bypassBitLocker'))cmds.push({d:'Bypass BitLocker check (24H2+)',p:'reg.exe add "HKLM\\SYSTEM\\Setup\\LabConfig" /v BypassBitLockerCheck /t REG_DWORD /d 1 /f'});
+  if(val('bypassUpgrade'))cmds.push({d:'Allow upgrade on unsupported hardware',p:'reg.exe add "HKLM\\SYSTEM\\Setup\\MoSetup" /v AllowUpgradesWithUnsupportedTPMOrCPU /t REG_DWORD /d 1 /f'});
+  if(cmds.length)setup+=runSync(cmds)+'\n';
+  const setupComp=comp('Microsoft-Windows-Setup',setup.trimEnd());
+
+  /* --- specialize --- */
+  const spCmds=[];
+  if(val('bypassNRO'))spCmds.push({d:'BypassNRO (legacy builds)',p:'reg.exe add "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\OOBE" /v BypassNRO /t REG_DWORD /d 1 /f'});
+  if(val('networkOOBE'))spCmds.push({d:'Temporarily disable network adapters (force local account OOBE)',p:'powershell.exe -NoProfile -Command "Get-NetAdapter | Disable-NetAdapter -Confirm:$false"'});
+  const depComp=spCmds.length?comp('Microsoft-Windows-Deployment',runSync(spCmds).trim()):'';
+  let shellSp='';
+  if(val('computername'))shellSp+=`        <ComputerName>${esc(val('computername'))}</ComputerName>\n`;
+  if(tz)shellSp+=`        <TimeZone>${esc(tz)}</TimeZone>\n`;
+  const shellSpComp=shellSp?comp('Microsoft-Windows-Shell-Setup',shellSp.trimEnd()):'';
+  let uj='';
+  if(val('joinmode')==='domain'&&val('domainname')){
+    uj=`        <Identification>
+          <JoinDomain>${esc(val('domainname'))}</JoinDomain>
+${val('domainou')?'          <MachineObjectOU>'+esc(val('domainou'))+'</MachineObjectOU>\n':''}          <Credentials>
+            <Domain>${esc((val('domainuser')||'').split('\\')[0]||val('domainname'))}</Domain>
+            <Username>${esc((val('domainuser')||'').split('\\')[1]||val('domainuser')||'')}</Username>
+            <Password><Value>${val('plaintext')?esc(val('domainpass')):utf16b64(val('domainpass')||'')}</Value><PlainText>${pt?'true':'false'}</PlainText></Password>
+          </Credentials>
+        </Identification>`;
+  }else if(val('workgroup')){
+    uj=`        <Identification>
+          <JoinWorkgroup>${esc(val('workgroup'))}</JoinWorkgroup>
+        </Identification>`;
+  }
+  const wgComp=uj?comp('Microsoft-Windows-UnattendedJoin',uj):'';
+
+  /* --- oobeSystem --- */
+  const ooIntl=comp('Microsoft-Windows-International-Core',
+`        <InputLocale>${esc(inp)}</InputLocale>
+        <SystemLocale>${esc(sl)}</SystemLocale>
+        <UILanguage>${esc(ui)}</UILanguage>
+        <UserLocale>${esc(ul)}</UserLocale>`);
+  let oo='';
+  oo+='        <OOBE>\n';
+  oo+=`          <HideEULAPage>${val('hideeula')?'true':'false'}</HideEULAPage>\n`;
+  oo+=`          <HideOEMRegistrationScreen>${val('hideoem')?'true':'false'}</HideOEMRegistrationScreen>\n`;
+  oo+=`          <HideOnlineAccountScreens>${val('hideonline')?'true':'false'}</HideOnlineAccountScreens>\n`;
+  oo+=`          <HideWirelessSetupInOOBE>${val('hidewireless')?'true':'false'}</HideWirelessSetupInOOBE>\n`;
+  if(accs.length)oo+='          <HideLocalAccountScreen>true</HideLocalAccountScreen>\n';
+  if(val('networklocation'))oo+=`          <NetworkLocation>${esc(val('networklocation'))}</NetworkLocation>\n`;
+  oo+=`          <ProtectYourPC>${esc(val('protectpc'))}</ProtectYourPC>\n`;
+  oo+='        </OOBE>\n';
+  if(accs.length){
+    oo+='        <UserAccounts>\n          <LocalAccounts>\n';
+    accs.forEach(a=>{
+      oo+='            <LocalAccount wcm:action="add">\n';
+      if(a.desc)oo+=`              <Description>${esc(a.desc)}</Description>\n`;
+      oo+=`              <DisplayName>${esc(a.display||a.name)}</DisplayName>\n`;
+      if(a.admin)oo+='              <Group>Administrators</Group>\n';
+      oo+=`              <Name>${esc(a.name)}</Name>\n`;
+      oo+=`              <Password><Value>${pt?esc(a.password):utf16b64(a.password||'')}</Value><PlainText>${pt?'true':'false'}</PlainText></Password>\n`;
+      oo+='            </LocalAccount>\n';
+    });
+    oo+='          </LocalAccounts>\n        </UserAccounts>\n';
+    const prim=primaryAccount();
+    if(val('autologon')&&prim){
+      oo+='        <AutoLogon>\n          <Enabled>true</Enabled>\n          <LogonCount>1</LogonCount>\n';
+      oo+=`          <Username>${esc(prim.name)}</Username>\n`;
+      oo+=`          <Password><Value>${pt?esc(prim.password):utf16b64(prim.password||'')}</Value><PlainText>${pt?'true':'false'}</PlainText></Password>\n`;
+      oo+='          <Domain>.</Domain>\n        </AutoLogon>\n';
+    }
+  }
+  if(tweaks){
+    const enc=utf16b64(tweaks);
+    oo+='        <FirstLogonCommands>\n          <SynchronousCommand wcm:action="add">\n            <Order>1</Order>\n            <Description>WinSetup Studio: tweaks and setup</Description>\n';
+    oo+=`            <CommandLine>powershell.exe -NoProfile -ExecutionPolicy Bypass -EncodedCommand ${enc}</CommandLine>\n`;
+    oo+='          </SynchronousCommand>\n        </FirstLogonCommands>\n';
+  }
+  const ooComp=comp('Microsoft-Windows-Shell-Setup',oo.trimEnd());
+
+  const xml=
+`<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated by WinSetup Studio 1.0.0 (${new Date().toLocaleString('bg-BG')}) -->
+<!-- Сложи този файл в ROOT (главната папка) на инсталационната флашка. -->
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+${pass('windowsPE',[peIntl,setupComp])}
+${pass('specialize',[depComp,shellSpComp,wgComp])}
+${pass('oobeSystem',[ooIntl,ooComp])}
+  <settings pass="offlineServicing"/>
+  <settings pass="generalize"/>
+  <settings pass="auditSystem"/>
+  <settings pass="auditUser"/>
+</unattend>`;
+  return xml;
+}
+
+/* ---------- валидация ---------- */
+function computeIssues(){
+  const errs=[],warns=[];
+  if((val('diskmode')==='auto-uefi'||val('diskmode')==='auto-bios')&&!val('wipeconfirm'))
+    errs.push('Автоматичният режим ИЗТРИВА диск 0 — дай отметка на „Потвърждавам“ в група „Дялове“ (изискване за безопасност).');
+  const accs=(S_st.accounts||[]).filter(a=>a&&a.name);
+  if(accs.length){
+    const names=accs.map(a=>a.name);
+    if(new Set(names).size!==names.length)errs.push('Имената на акаунтите трябва да са уникални.');
+    accs.forEach(a=>{
+      if(/[А-Яа-яЁё\s]/.test(a.name))errs.push(`Акаунтът „${a.name}“: потребителското име трябва да е само латиница без интервали (видимото име може на кирилица).`);
+    });
+    const prim=primaryAccount();
+    if(val('autologon')&&prim&&!(prim.password||'').length)errs.push('Автоматичният вход (AutoLogon) изисква парола на основния акаунт.');
+  }else{
+    warns.push('Няма дефиниран локален акаунт — OOBE ще пита за акаунт (при онлайн режим — Microsoft акаунт).');
+    if(val('autologon'))warns.push('AutoLogon е включен, но няма потребител — ще бъде пропуснат.');
+  }
+  if(val('joinmode')==='domain'){
+    if(!val('domainname'))errs.push('Избран е Domain режим, но не е въведено име на домейна (група „Мрежа и домейн“).');
+    if(!val('domainuser')||!val('domainpass'))warns.push('За domain join е нужен акаунт и парола на домейна.');
+  }
+  if(val('computername')){
+    const cn=String(val('computername'));
+    if(cn.length>15||/[^A-Za-z0-9-]/.test(cn))warns.push('Името на компютъра: до 15 знака, само латиница/цифри/тирета.');
+  }
+  if(val('edition')==='auto'&&!String(val('productkey')).trim())
+    warns.push('Без ключ: Setup ще избере издание автоматично (BIOS лиценз или изданието на ISO).');
+  if(val('plaintext'))warns.push('Паролите ще се запишат като ЧИСТ ТЕКСТ в XML-а.');
+  if(val('appsPreset')==='aggressive')warns.push('Агресивният debloat маха почти всичко от Store — ползвай само на познати машини.');
+  if(val('networkOOBE'))warns.push('Агресивен мрежов режим: интернет липсва до първия вход (адаптерите се включват автоматично от твикс-скрипта).');
+  if(['Home','HomeN','HomeSL'].includes(val('edition'))&&(val('f_hyperv')||val('f_sandbox')))
+    warns.push('Hyper-V и Windows Sandbox липсват в Home издания — компонентът няма да се инсталира.');
+  if(['25H2','26H2'].includes(val('targetversion')))
+    warns.push('25H2/26H2 бележка: ако Setup започне да задава въпроси (новият „ConX“ режим понякога игнорира файла) — Shift+F10 → „setup.exe /Unattend:X:\\autounattend.xml“. Виж „Помощ“.');
+  if(val('dynupdate'))warns.push('Dynamic Update: инсталацията ще тегли ъпдейти от интернет (не е чисто офлайн).');
+  if(selectedApps().length&&val('networkOOBE'))
+    warns.push('Приложенията се инсталират при първия вход — с агресивния мрежов режим мрежата се включва точно преди това, но може да забави.');
+  return {errs,warns};
+}
+
+/* ---------- summary + preview ---------- */
+function updateSummary(){
+  const {errs,warns}=computeIssues();
+  let h='<div class="rbtns"><button id="genBtn">💾 Генерирай autounattend.xml</button><button id="copyBtn">📋 Копирай XML</button></div>';
+  if(errs.length)h+=errs.map(e=>`<div class="iss err">⛔ ${esc(e)}</div>`).join('');
+  if(warns.length)h+=warns.map(w=>`<div class="iss warn">⚠️ ${esc(w)}</div>`).join('');
+  if(!errs.length&&!warns.length)h+='<div class="iss ok">✅ Проверките минаха чисто. Генерирай и сложи файла в ROOT на флашката.</div>';
+  const accList=(S_st.accounts||[]).filter(a=>a&&a.name).map(a=>a.name+(a.admin?'*':'')).join(', ');
+  const apps=selectedApps().length;
+  const rows=[
+    ['Версия',()=>val('targetversion')],
+    ['Издание',()=>val('edition')==='auto'?'без ключ':val('edition')],
+    ['Език',()=>val('uilanguage')],
+    ['Часова зона',()=>val('timezone')],
+    ['Bypass хардуер',()=>val('bypasshw')?'ДА':'не'],
+    ['Дялове',()=>({manual:'ръчно',['auto-uefi']:'АВТОМАТИЧНО (изтриване диск 0!)',['auto-bios']:'АВТОМАТИЧНО BIOS (изтриване!)',avail:'първия подходящ дял'})[val('diskmode')]],
+    ['Акаунти',()=>accList||'— (ще пита в OOBE)'],
+    ['AutoLogon',()=>val('autologon')?'да ('+((primaryAccount()&&primaryAccount().name)||'—')+')':'не'],
+    ['Приложения',()=>apps?apps+' бр. (winget)':'без'],
+    ['Debloat',()=>val('appsPreset')==='none'?'без':val('appsPreset')],
+    ['Домейн',()=>val('joinmode')==='domain'?(val('domainname')||'въведи име'):'Workgroup'],
+    ['Твикс-скрипт',()=>buildTweaksScript()?'ще се вгради в XML (base64)':'не е нужен'],
+    ['Мрежа',()=>(val('computername')?val('computername'):'авто-име')]
+  ];
+  h+='<h4 style="margin:14px 0 6px">Обобщение</h4>';
+  rows.forEach(r=>{
+    let v;try{v=r[1]()}catch(e){v='—'}
+    h+=`<div class="sumline"><span class="k">${r[0]}:</span><span>${esc(String(v))}</span></div>`;
+  });
+  h+='<div class="hint" style="margin-top:10px">Файлът се казва <b>autounattend.xml</b> и се слага в <b>root</b> на флашката (до setup.exe, не в папка).</div>';
+  $('tab-sum').innerHTML=h;
+  $('genBtn').onclick=generate;
+  $('genBtn').disabled=errs.length>0;
+  $('copyBtn').onclick=copyXML;
+}
+function updatePreview(){
+  const x=buildXML();
+  const hl=esc(x)
+    .replace(/(&lt;!--[\s\S]*?--&gt;)/g,'<span class="c">$1</span>')
+    .replace(/(&lt;\/?)([\w:\-.]+)/g,'$1<span class="t">$2</span>')
+    .replace(/([\w:\-]+)=(&quot;.*?&quot;)/g,'<span class="a">$1</span>=<span class="v">$2</span>');
+  $('xmlbox').innerHTML=hl;
+}
+function generate(){
+  const {errs}=computeIssues();
+  if(errs.length){toast('Има неуредени грешки — виж „Резюме“.');return}
+  download('autounattend.xml',buildXML(),'application/xml');
+  toast('Свален: autounattend.xml — сложи го в ROOT на флашката!');
+}
+function copyXML(){
+  const x=buildXML();
+  const done=()=>toast('XML-ът е в клипборда.');
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(x).then(done).catch(()=>fallbackCopy(x,done))}
+  else fallbackCopy(x,done);
+}
+function fallbackCopy(t,done){
+  const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');done()}catch(e){toast('Копирането не успя — използвай бутона XML → маркирай ръчно.')}
+  ta.remove();
+}
+
+/* ---------- профил: импорт/експорт ---------- */
+let lastProfile=null;
+function saveProfile(){
+  const out={type:'winsetup-studio-profile',version:2,generated:new Date().toISOString(),settings:{}};
+  S.forEach(x=>{if(JSON.stringify(S_st[x.id])!==JSON.stringify(defaults[x.id]))out.settings[x.id]=S_st[x.id]});
+  if(S_st.wingetapps)out.settings.wingetapps=S_st.wingetapps;
+  out.accounts=S_st.accounts;
+  out.appsMap=S_st.appsMap;
+  download('winsetup-studio-profile.json',JSON.stringify(out,null,2),'application/json');
+  toast('Профилът е запазен.');
+}
+function importProfileText(txt,name){
+  let o;try{o=JSON.parse(txt.replace(/^\uFEFF/,''))}catch(e){toast('Файлът не е валиден JSON.');return}
+  const st=o&&o.settings?o.settings:o;
+  const ED_MAP={Professional:'Pro',ProfessionalN:'ProN',Core:'Home',CoreN:'HomeN',CoreSingleLanguage:'HomeSL',CoreCountrySpecific:'Home',ProfessionalEducation:'Education',Education:'Education',ProfessionalWorkstation:'ProWS',Enterprise:'Enterprise',EnterpriseS:'LTSC2024',EnterpriseGN:'Enterprise',IoTEnterprise:'IoTLTSC2024',IoTEnterpriseS:'IoTLTSC2024'};
+  if('edition' in st&&ED_MAP[st.edition]){st.edition=ED_MAP[st.edition];if(!('productkey' in st)&&KEYS[st.edition])st.productkey=KEYS[st.edition]}
+  let n=0;
+  S.forEach(x=>{
+    if(x.id in st){
+      const v=st[x.id];
+      if(typeof defaults[x.id]==='boolean'){S_st[x.id]=(v===true||v==='true'||v===1)}
+      else if(typeof defaults[x.id]==='number'&&v!==''&&v!=null){S_st[x.id]=Number(v)}
+      else S_st[x.id]=v;
+      n++;
+    }
+  });
+  if(o&&Array.isArray(o.accounts)&&o.accounts.length){S_st.accounts=o.accounts;n++}
+  else if(o&&o.settings&&o.settings.username){S_st.accounts=[{name:o.settings.username,display:o.settings.displayname||'',password:o.settings.userpassword||'',admin:o.settings.useradmin!==false,desc:o.settings.userdesc||''}];n++}
+  if(o&&o.appsMap){S_st.appsMap=o.appsMap;n++}
+  if(o&&o.settings&&'wingetapps' in o.settings){S_st.wingetapps=o.settings.wingetapps;n++}
+  /* език без подредби → изчисли подредбите автоматично */
+  if(o&&o.settings&&'uilanguage' in o.settings&&!("inputlocale" in o.settings)&&LOCALES[S_st.uilanguage]){S_st.inputlocale=LOCALES[S_st.uilanguage]}
+  if(o&&o.computer&&!('computername' in st)&&o.computer.name){S_st.computername=o.computer.name;n++}
+  if(o&&o.features){[['hyperV','f_hyperv'],['wsl','f_wsl'],['sandbox','f_sandbox'],['netFx3','f_netfx35']].forEach(p=>{if(typeof o.features[p[0]]==='boolean'){S_st[p[1]]=o.features[p[0]];n++}})}
+  lastProfile=o;
+  S_st.__keyManual=false;
+  saveState();renderContent();updatePreview();updateSummary();
+  toast(`Импортирани ${n} стойности от ${name||'файла'}.`);
+  if(o&&o.programs){
+    const np=$('tab-sum');
+    const info=document.createElement('div');
+    info.className='iss ok';
+    info.innerHTML=`ℹ️ Старият компютър имаше ${o.programs.length} инсталирани програми. Първите: ${o.programs.slice(0,8).map(esc).join(', ')}${o.programs.length>8?'…':''}. Избери съответните от група „Приложения“.`;
+    np.insertBefore(info,np.firstChild.nextSibling);
+  }
+}
+
+/* ---------- helper (автоматичен режим: 1 клик вместо сваляне/стартиране) ---------- */
+const HELPER={mode:'file',admin:false,base:''};
+let helperProbe=null;
+function probeHelper(){
+  helperProbe=(async()=>{
+    const candidates=['api/ping','http://127.0.0.1:8891/api/ping','http://127.0.0.1:8892/api/ping','http://127.0.0.1:8893/api/ping'];
+    for(const c of candidates){
+      try{
+        const r=await fetch(c,{cache:'no-store'});
+        const j=await r.json();
+        if(j&&j.ok){HELPER.mode='helper';HELPER.admin=!!j.admin;HELPER.base=c.replace('api/ping','');break}
+      }catch(e){/* следващ кандидат */}
+    }
+    const b=$('apiBadge');
+    if(b&&HELPER.mode==='helper'){
+      b.style.display='';
+      b.textContent=HELPER.admin?'🛡 АВТОМАТИЧЕН (админ)':'⚡ АВТОМАТИЧЕН (без админ)';
+    }
+  })();
+  return helperProbe;
+}
+
+/* ---------- модали ---------- */
+function openModal(html){$('modalBox').innerHTML=html;$('modal').classList.add('open')}
+function closeModal(){$('modal').classList.remove('open')}
+$('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('modal').classList.contains('open'))closeModal()});
+
+async function modalReadPC(){
+  await (helperProbe||probeHelper());
+  const ps=$('embed-export').textContent.trim();
+  const manual=`
+      <ol>
+        <li><button class="mbtn" id="dlExport">⬇ Изтегли Export-WinSettings.ps1</button></li>
+        <li>Отвори PowerShell (Win+X → „Терминал“) и пусни:<pre>powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\Export-WinSettings.ps1"</pre></li>
+        <li>Провлачи получения JSON върху приложението или <button class="mbtn sec" id="pickImport">Избери файла…</button> <input type="file" id="importFile" accept=".json,application/json" style="display:none"></li>
+      </ol>`;
+  let html;
+  if(HELPER.mode==='helper'){
+    html=`<h3>🖥 Прочети настройките на този компютър</h3>
+      <div class="iss ok">⚡ Автоматичен режим е активен${HELPER.admin?' <b>(админ)</b>':' <b>(без админ — компоненти/BitLocker/дискове ще липсват)</b>'}.</div>
+      <p>ЕДИН КЛИК — без сваляне на скриптове, без PowerShell, без местене на файлове:</p>
+      <p><button class="mbtn" id="autoExport">⚡ Прочети сега</button></p>
+      <p class="hint">Правата идват от helper-а (стартиран от WinSetupStudio.cmd с UAC). Ако искаш пълните данни — рестартирай през WinSetupStudio.cmd и приеми UAC.</p>
+      <details class="more"><summary>Ръчният вариант (старият начин)</summary><div class="body">${manual}
+        <span class="hint">Записва профил на Десктопа: WinSetupStudio-profile.json — вкл. инсталирани програми и хардуер.</span>
+      </div></details>
+      <div class="mfoot"><button class="mbtn sec" onclick="document.getElementById('modal').classList.remove('open')">Затвори</button></div>`;
+  }else{
+    html=`<h3>🖥 Прочети настройките на този компютър</h3>
+      <div class="iss warn">⚠️ Ръчен режим: приложението е отворено директно като файл. За <b>автоматично с 1 клик</b> — стартирай <b>WinSetupStudio.cmd</b> (той пита за админ права и пуска помощника).</div>
+      ${manual}
+      <div class="mfoot"><button class="mbtn sec" onclick="document.getElementById('modal').classList.remove('open')">Затвори</button></div>`;
+  }
+  openModal(html);
+  const ab=$('autoExport');
+  if(ab)ab.onclick=async()=>{
+    ab.disabled=true;ab.textContent='⏳ Чета настройките…';
+    try{
+      const txt=await (await fetch(HELPER.base+'api/export',{cache:'no-store'})).text();
+      importProfileText(txt,'този комп');
+      closeModal();
+    }catch(e){ab.disabled=false;ab.textContent='⚡ Прочети сега';toast('Helper грешка: '+e.message)}
+  };
+  const de=$('dlExport');
+  if(de)de.onclick=()=>{download('Export-WinSettings.ps1','\uFEFF'+ps,'text/plain');toast('Свален Export-WinSettings.ps1 (в Downloads).')};
+  const pi=$('pickImport');
+  if(pi)pi.onclick=()=>$('importFile').click();
+  const inf=$('importFile');
+  if(inf)inf.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=()=>{importProfileText(r.result,f.name);closeModal()};
+    r.readAsText(f,'utf-8');
+  };
+}
+async function modalIso(){
+  await (helperProbe||probeHelper());
+  const ps=$('embed-iso').textContent.trim();
+  const langs=['Bulgarian','English (United States)','English (United Kingdom)','German','French','Russian','Turkish','Greek','Romanian','Spanish','Italian','Polish'];
+  const auto=(HELPER.mode==='helper')?`
+    <div class="iss ok">⚡ Автоматичен режим активен.</div>
+    <p><button class="mbtn" id="autoIso">⚡ Свали сега (PowerShell прозорец с прогрес)</button></p>
+    <p class="hint">ISO-ът (~5–6 GB) отива в Downloads. След това — „🔌 Флашка“ с пътя към него.</p>
+    <hr style="border:0;border-top:1px solid var(--line);margin:12px 0">`:`
+    <div class="iss warn">⚠️ Ръчен режим: за <b>автоматично с 1 клик</b> стартирай <b>WinSetupStudio.cmd</b>.</div>`;
+  openModal(`
+    <h3>⬇ Свали Windows (официален ISO)</h3>
+    <p>Връзката е <b>директно от сървърите на Microsoft</b> (същият API като страницата за сваляне) — оригинален ISO, нищо не е модифицирано.</p>
+    ${auto}
+    <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin:8px 0">
+      <div><label class="hint">Версия</label><br><select id="isoVer"><option value="Win11">Windows 11 (26H2, x64)</option><option value="Win10">Windows 10 22H2 (x64)</option></select></div>
+      <div><label class="hint">Език</label><br><select id="isoLang">${langs.map(l=>`<option ${l==='Bulgarian'?'selected':''}>${l}</option>`).join('')}</select></div>
+    </div>
+    <details class="more" ${HELPER.mode==='helper'?'':'open'}><summary>Ръчният вариант (сваляне на скрипта)</summary><div class="body">
+      <pre id="isoCmd">powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\Get-WindowsIso.ps1" -Version Win11 -Language Bulgarian</pre>
+      <p class="hint">Първо: <button class="mbtn" id="dlIso">⬇ Изтегли Get-WindowsIso.ps1</button>. С <b>-ListLangs</b> виждаш езиците, с <b>-List</b> само връзката.</p>
+    </div></details>
+    <p class="hint">Резервен вариант (винаги работещ): <a href="https://www.microsoft.com/software-download/windows11" target="_blank">microsoft.com/software-download/windows11</a> — Media Creation Tool или ISO ръчно.</p>
+    <div class="mfoot"><button class="mbtn sec" onclick="document.getElementById('modal').classList.remove('open')">Затвори</button></div>`);
+  const upd=()=>{
+    const v=$('isoVer').value,l=$('isoLang').value;
+    $('isoCmd').textContent=`powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\\Downloads\\Get-WindowsIso.ps1" -Version ${v} -Language "${l}"`;
+  };
+  $('isoVer').onchange=upd;$('isoLang').onchange=upd;
+  $('dlIso').onclick=()=>{download('Get-WindowsIso.ps1','\uFEFF'+ps,'text/plain');toast('Свален Get-WindowsIso.ps1 (в Downloads).')};
+  const ai=$('autoIso');
+  if(ai)ai.onclick=async()=>{
+    ai.disabled=true; ai.textContent='⏳ Стартирам сваляне…';
+    try{
+      const r=await fetch(HELPER.base+'api/iso',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({version:$('isoVer').value,language:$('isoLang').value})});
+      const j=await r.json();
+      if(j.error){toast('Грешка: '+j.error);ai.disabled=false;ai.textContent='⚡ Свали сега (PowerShell прозорец с прогрес)';return}
+      toast('Свалянето започна — виж PowerShell прозореца.');
+      closeModal();
+    }catch(e){toast('Helper грешка: '+e.message);ai.disabled=false;ai.textContent='⚡ Свали сега (PowerShell прозорец с прогрес)'}
+  };
+}
+async function modalUsb(){
+  await (helperProbe||probeHelper());
+  const ps=$('embed-usb').textContent.trim();
+  const auto=(HELPER.mode==='helper')?`
+    <div class="iss ok">⚡ Автоматичен режим активен${HELPER.admin?' <b>(админ)</b>':' <b>(без админ — скриптът ще изиска права)</b>'}.</div>
+    <p>Пътят към ISO файла: <input id="usbIsoPath" type="text" style="width:100%;padding:6px 9px;border:1px solid var(--line);border-radius:7px;background:var(--input-bg);color:var(--ink)" placeholder="C:\\ISO\\Win11.iso"></p>
+    <p>
+      <button class="mbtn" id="autoUsb">⚡ Стартирай флашката сега</button>
+      <button class="mbtn sec" id="autoUsbWhat">WhatIf (само план, без изтриване)</button>
+    </p>
+    <p class="hint">Ще се отвори PowerShell прозорец — там потвърждаваш с „ДА“ и избираш флашката (или подай буква). Нищо не се изтрива без това потвърждение.</p>
+    <hr style="border:0;border-top:1px solid var(--line);margin:12px 0">`:`
+    <div class="iss warn">⚠️ Ръчен режим: за <b>автоматично с 1 клик</b> стартирай <b>WinSetupStudio.cmd</b>.</div>`;
+  openModal(`
+    <h3>🔌 Помощник за инсталационна флашка</h3>
+    ${auto}
+    <p><b>Какво прави скриптът:</b> изтрива флашката → FAT32 → копира ISO съдържанието → разделя install.wim над 4GB (.swm — „компресията, която се чупеше“) → слага <b>autounattend.xml</b> в root → <b>копира и самия WinSetup Studio</b> на флашката.</p>
+    <details class="more"><summary>Ръчният вариант (сваляне на скрипта)</summary><div class="body">
+      <pre>powershell -ExecutionPolicy Bypass -File Make-SetupUSB.ps1 -IsoPath "C:\\ISO\\Win11.iso"</pre>
+      <p class="hint">КАТО АДМИНИСТРАТОР. Флашка до 32GB (FAT32); за по-големи — Rufus с UEFI:NTFS.</p>
+      <button class="mbtn" id="dlUsb">⬇ Изтегли Make-SetupUSB.ps1</button>
+    </div></details>
+    <div class="mfoot"><button class="mbtn sec" onclick="document.getElementById('modal').classList.remove('open')">Затвори</button></div>`);
+  const du=$('dlUsb');
+  if(du)du.onclick=()=>{download('Make-SetupUSB.ps1','\uFEFF'+ps,'text/plain');toast('Свален Make-SetupUSB.ps1 (в Downloads).')};
+  const au=$('autoUsb'),aw=$('autoUsbWhat');
+  const startUsb=async whatIf=>{
+    const p=$('usbIsoPath').value.trim();
+    if(!p){toast('Въведи пътя към ISO файла.');return}
+    if(!/^.:\\/.test(p)){toast('Пътят трябва да е пълен, напр. C:\\ISO\\Win11.iso');return}
+    au.disabled=true; if(aw)aw.disabled=true; au.textContent='⏳ Стартирам…';
+    try{
+      const r=await fetch(HELPER.base+'api/usb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({isoPath:p,whatIf:!!whatIf})});
+      const j=await r.json();
+      if(j.error){toast('Грешка: '+j.error);au.disabled=false;au.textContent='⚡ Стартирай флашката сега';if(aw)aw.disabled=false;return}
+      toast('Стартирано — виж PowerShell прозореца.');
+      closeModal();
+    }catch(e){toast('Helper грешка: '+e.message);au.disabled=false;au.textContent='⚡ Стартирай флашката сега';if(aw)aw.disabled=false}
+  };
+  if(au)au.onclick=()=>startUsb(false);
+  if(aw)aw.onclick=()=>startUsb(true);
+}
+function modalHelp(){
+  openModal(`
+    <h3>❓ Как работи всичко това</h3>
+    <p><b>Идеята:</b> <i>autounattend.xml</i> е официалният „answer file“ на Windows Setup. Когато стои в <b>ROOT директорията</b> на всяко boot устройство, Setup го открива сам и отговаря на въпросите вместо теб. Получава се инсталация, която започваш и оставяш сама.</p>
+    <h4>Пълен цикъл (всичко е в папката)</h4>
+    <ol>
+      <li>⬇ <b>Свали Windows</b> — Get-WindowsIso.ps1 взема официален ISO (или MCT страницата).</li>
+      <li>Настрой тук всичко → <b>Генерирай autounattend.xml</b>.</li>
+      <li>🔌 <b>Make-SetupUSB.ps1</b> — прави флашката и я захранва с файла + самия инструмент.</li>
+      <li>Boot от флашката → инсталацията тече сама → приложенията се инсталират при първия вход.</li>
+    </ol>
+    <h4>Два варианта на програмата</h4>
+    <ul>
+      <li><b>Уеб:</b> WinSetupStudio.html — двойный клик в Edge/Chrome (работи и ОФЛАЙН от флашката).</li>
+      <li><b>Приложение:</b> WinSetupStudio.cmd — същото в собствен прозорец без браузърни лентове (Edge --app режим).</li>
+    </ul>
+    <h4>Windows 11 25H2/26H2 — важни бележки</h4>
+    <ul>
+      <li>„ConX“ режим <b>понякога игнорира</b> answer файла: <b>Shift+F10</b> → <code>setup.exe /Unattend:D:\\autounattend.xml</code>.</li>
+      <li>MS акаунт: файлът създава <b>локален акаунт директно</b> (UserAccounts + HideOnlineAccountScreens) — работи. Резерви: агресивният мрежов режим (група 3) или ръчно: <code>start ms-cxh:localonly</code>.</li>
+      <li>Хардуерните bypass-и (TPM/SecureBoot/RAM) работят и в 25H2/26H2.</li>
+    </ul>
+    <h4>Защо „компресията се чупеше“</h4>
+    <p>FAT32 (задължително за UEFI boot) не може файлове над <b>4GB</b>. Решението: <code>dism /Split-Image /ImageFile:install.wim /SWMFile:install.swm /FileSize:3800</code> — Setup чете .swm автоматично. Прави го Make-SetupUSB.ps1.</p>
+    <h4>Ключовете</h4>
+    <p>Generic ключовете са публични и служат само да <b>изберат издание</b> — не активират Windows. Активацията идва от цифровия лиценз/реалния ключ след инсталация.</p>
+    <h4>Източници (проверени 11.2026)</h4>
+    <ul>
+      <li><a href="https://schneegans.de/windows/unattend-generator/" target="_blank">schneegans.de Unattend Generator</a> — вероятният „изгубен“ инструмент.</li>
+      <li><a href="https://github.com/memstechtips/UnattendedWinstall" target="_blank">UnattendedWinstall</a> — референтни 25H2 файлове.</li>
+      <li><a href="https://github.com/pbatard/Fido" target="_blank">Fido (Pbatard)</a> — методът за официални ISO връзки (използван в Get-WindowsIso.ps1).</li>
+      <li><a href="https://learn.microsoft.com/en-us/windows-server/get-started/kms-client-activation-keys" target="_blank">Microsoft: KMS client keys</a></li>
+    </ul>
+    <div class="mfoot"><button class="mbtn sec" onclick="document.getElementById('modal').classList.remove('open')">Затвори</button></div>`);
+}
+
+/* ---------- help tab ---------- */
+function renderHelpTab(){
+  $('tab-help').innerHTML=`
+    <h4>Бърз старт (пълният цикъл)</h4>
+    <p>1. ⬇ Свали Windows → 2. Настрой → 3. <b>Генерирай</b> → 4. 🔌 Make-SetupUSB.ps1 (флашка + файл + инструмент) → 5. Boot и не пипай нищо. Приложенията от група 8 се инсталират сами при първия вход.</p>
+    <h4>Цветовете</h4>
+    <p>🟢 зелено = безопасно за всеки · 🟠 оранжево = разширено, прочети обяснението · 🔴 червено = опасно/експертно. Всяка настройка има „Какво е това?“. Превключвател <b>Базов/Подробен</b> е горе.</p>
+    <h4>Профил (експорт/импорт)</h4>
+    <p>„🖥 Прочети този комп“ → скриптът записва JSON на Десктопа → провлачи го върху приложението и коригирай каквото искаш. „📤 Запази профил“ записва твоя настройки за следващ път.</p>
+    <h4>25H2/26H2 ConX бележка</h4>
+    <pre>Shift+F10 → setup.exe /Unattend:D:\\autounattend.xml</pre>
+    <h4>MS акаунт фолбек (OOBE)</h4>
+    <pre>start ms-cxh:localonly</pre>
+    <h4>install.wim &gt; 4GB (FAT32)</h4>
+    <pre>dism /Split-Image /ImageFile:install.wim /SWMFile:install.swm /FileSize:3800</pre>
+    <p class="hint">Подробности: бутон „❓ Помощ“ горе. Източници: schneegans.de · UnattendedWinstall · Fido · MS KMS keys · ElevenForum.</p>`;
+}
+
+/* ---------- тема ---------- */
+function initTheme(){
+  let t='dark';
+  try{t=localStorage.getItem('wss-theme')||'dark'}catch(e){}
+  document.documentElement.setAttribute('data-theme',t);
+  $('btnTheme').textContent=(t==='dark'?'☀️':'🌙');
+}
+
+/* ---------- init ---------- */
+function init(){
+  initTheme();
+  probeHelper();
+  loadState();
+  renderNav();renderContent();updatePreview();updateSummary();renderHelpTab();
+  bindEvents();
+  $('topGen').onclick=generate;
+  $('btnImport').onclick=modalReadPC;
+  $('btnReadPC').onclick=modalReadPC;
+  $('btnIso').onclick=modalIso;
+  $('btnUsb').onclick=modalUsb;
+  $('btnHelp').onclick=()=>{document.querySelector('#rtabs button[data-tab=help]').click()};
+  $('bannerMore').onclick=modalHelp;
+  $('btnSaveProf').onclick=saveProfile;
+  $('btnTheme').onclick=()=>{
+    const cur=document.documentElement.getAttribute('data-theme');
+    const nxt=cur==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',nxt);
+    try{localStorage.setItem('wss-theme',nxt)}catch(e){}
+    $('btnTheme').textContent=(nxt==='dark'?'☀️':'🌙');
+  };
+  $('btnReset').onclick=()=>{if(confirm('Връщане на ВСИЧКИ настройки по подразбиране?')){S_st=Object.assign({},defaults);S_st.accounts=makeDefaultAccounts();S_st.appsMap={};S_st.__keyManual=false;saveState();renderContent();updatePreview();updateSummary();toast('Настройките са нулирани.')}};
+  document.querySelectorAll('#rtabs button').forEach(b=>{
+    b.onclick=()=>{
+      document.querySelectorAll('#rtabs button').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      ['sum','xml','help'].forEach(t=>$('tab-'+t).style.display=(t===b.dataset.tab?'':'none'));
+      if(b.dataset.tab==='xml')updatePreview();
+      if(b.dataset.tab==='sum')updateSummary();
+    };
+  });
+  window.addEventListener('beforeunload',saveState);
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
