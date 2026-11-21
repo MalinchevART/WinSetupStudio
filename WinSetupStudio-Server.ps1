@@ -108,7 +108,7 @@ while ($listener.IsListening) {
             Send-Json $res @{ error = 'Отказано: заявката не е от собственото UI на WinSetup Studio (само localhost).' } 403
         }
         elseif ($path -eq '/api/ping') {
-            Send-Json $res @{ ok = $true; admin = $isAdmin; version = '1.1.0'; port = $Port }
+            Send-Json $res @{ ok = $true; admin = $isAdmin; version = '1.2.0'; port = $Port }
         }
         elseif ($path -eq '/api/export') {
             # Четене на настройките: child процес (наследява правата на helper-а), с timeout
@@ -183,6 +183,37 @@ while ($listener.IsListening) {
                         (Join-Path $root 'Get-WindowsIso.ps1'),
                         '-Version', $ver, '-Language', $lang)
                     Send-Json $res @{ started = $true; note = 'Свалянето стартира в PowerShell прозорец (~5-6 GB, отива в Downloads).' }
+                }
+            }
+        }
+        elseif ($path -eq '/api/drivers') {
+            if ($ctx.Request.ContentLength64 -gt 65536) {
+                Send-Json $res @{ error = 'Прекалено голямо тяло на заявката.' } 413
+            }
+            else {
+                $body = (New-Object System.IO.StreamReader($ctx.Request.InputStream, [System.Text.Encoding]::UTF8)).ReadToEnd()
+                $req = $null
+                try { $req = $body | ConvertFrom-Json } catch {}
+                if (-not $req -or -not $req.url) {
+                    Send-Json $res @{ error = 'Липсва url (директната връзка към драйвер пакета).' } 400
+                }
+                else {
+                    # домейн allowlist: само официални вендор домейни
+                    $u = $null
+                    try { $u = [uri]$req.url } catch {}
+                    if (-not $u -or $u.Scheme -ne 'https' -or ($u.Host -notmatch '\.(lenovo|dell|hp)\.com$' -and $u.Host -notmatch '^(lenovo|dell|hp)\.com$')) {
+                        $hst = if ($u) { $u.Host } else { 'invalid' }
+                        Send-Json $res @{ error = ('URL-ът трябва да е от официален вендор домейн (lenovo.com / dell.com / hp.com) — получих: ' + $hst) } 400
+                    }
+                    else {
+                        $drvDir = "$env:USERPROFILE\Downloads\WinSetupStudio-drivers"
+                        New-Item -ItemType Directory -Path $drvDir -Force | Out-Null
+                        $fname = ($u.Segments[-1] -replace '[^\w.\-]', '_')
+                        # конкатенация (не -f: литералните { } в PS блока чупят формата)
+                        $cmd = 'try { Start-BitsTransfer -Source "' + $req.url + '" -Destination "' + $drvDir + '\' + $fname + '" -DisplayName "WinSetup Studio: driver pack"; Write-Host ГОТОВО -ForegroundColor Green } catch { Write-Host $_.Exception.Message -ForegroundColor Red; Read-Host Enter }'
+                        Start-Process powershell -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', $cmd)
+                        Send-Json $res @{ started = $true; note = ('Сваля се в ' + $drvDir + ' — после копирай в \drivers на флашката.') }
+                    }
                 }
             }
         }

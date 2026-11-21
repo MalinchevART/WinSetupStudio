@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>WinSetup Studio 1.1 — генератор на autounattend.xml</title>
+<title>WinSetup Studio 1.2 — генератор на autounattend.xml</title>
 <style>
 :root{
   --bg:#f4f6f9; --card:#ffffff; --ink:#1d2430; --mut:#5c6675; --line:#dde3ec;
@@ -182,7 +182,7 @@ aside#right{position:sticky;top:0;border-left:1px solid var(--line);height:100vh
 <body>
 
 <header>
-  <div class="logo">⚙️ WinSetup Studio <span class="ver">1.1.0</span><span id="apiBadge" class="ver" style="display:none"></span></div>
+  <div class="logo">⚙️ WinSetup Studio <span class="ver">1.2.0</span><span id="apiBadge" class="ver" style="display:none"></span></div>
   <div class="sub">Генератор на <b>autounattend.xml</b> — инсталирай Windows без въпроси, вече настроен. Работи изцяло офлайн; нищо не се изпраща никъде.</div>
   <button class="btn primary" id="topGen">💾 Генерирай autounattend.xml</button>
   <button class="btn" id="btnReadPC">🖥 Прочети този комп</button>
@@ -380,6 +380,60 @@ else {
     Write-Host 'Пуснете отново с "Като администратор", ако искате пълните данни.' -ForegroundColor Yellow
 }
 
+# ---------- Съпоставяне с winget каталога на WinSetup Studio ----------
+$wingetMap = @{
+    'Google.Chrome'                    = 'Google Chrome'
+    'Mozilla.Firefox'                  = 'Mozilla Firefox'
+    'Brave.Brave'                      = 'Brave'
+    'Vivaldi.Vivaldi'                  = 'Vivaldi'
+    '7zip.7zip'                        = '7-Zip'
+    'voidtools.Everything'             = 'Everything'
+    'AntibodySoftware.WizTree'         = 'WizTree'
+    'Rufus.Rufus'                      = 'Rufus'
+    'VideoLAN.VLC'                     = 'VLC media player'
+    'IrfanView.IrfanView'              = 'IrfanView'
+    'foobar2000.foobar2000'            = 'foobar2000'
+    'Audacity.Audacity'                = 'Audacity'
+    'OBSProject.OBSStudio'             = 'OBS Studio'
+    'Notepad++.Notepad++'              = 'Notepad++'
+    'LibreOffice.LibreOffice'          = 'LibreOffice'
+    'SumatraPDF.SumatraPDF'            = 'SumatraPDF'
+    'Adobe.Acrobat.Reader.64-bit'      = 'Adobe Acrobat'
+    'KDE.Krita'                        = 'Krita'
+    'Microsoft.PowerShell'             = 'PowerShell 7'
+    'Microsoft.VisualStudioCode'       = 'Visual Studio Code'
+    'Git.Git'                          = 'Git'
+    'Python.Python.3.12'               = 'Python 3.12'
+    'OpenJS.NodeJS.LTS'                = 'Node.js'
+    'Docker.DockerDesktop'             = 'Docker Desktop'
+    'Postman.Postman'                  = 'Postman'
+    'WiresharkFoundation.Wireshark'    = 'Wireshark'
+    'PuTTY.PuTTY'                      = 'PuTTY'
+    'WinSCP.WinSCP'                    = 'WinSCP'
+    'Insecure.Nmap'                    = 'Nmap'
+    'famatech.AdvancedIPScanner'       = 'Advanced IP Scanner'
+    'qBittorrent.qBittorrent'          = 'qBittorrent'
+    'FileZilla.FileZilla'              = 'FileZilla'
+    'ShareX.ShareX'                    = 'ShareX'
+    'Microsoft.PowerToys'              = 'PowerToys'
+    'Discord.Discord'                  = 'Discord'
+    'TelegramMessenger.TelegramDesktop'= 'Telegram'
+    'Zoom.Zoom'                        = 'Zoom'
+    'SlackTechnologies.Slack'          = 'Slack'
+    'Notion.Notion'                    = 'Notion'
+    'TeamViewer.TeamViewer'            = 'TeamViewer'
+    'AnyDesk.AnyDesk'                  = 'AnyDesk'
+    'Valve.Steam'                      = 'Steam'
+    'Spotify.Spotify'                  = 'Spotify'
+}
+$matchedApps = @()
+foreach ($k in $wingetMap.Keys) {
+    $needle = $wingetMap[$k]
+    $hit = $programs | Where-Object { $_ -like "*$needle*" } | Select-Object -First 1
+    if ($hit) { $matchedApps += $k }
+}
+$matchedApps = @($matchedApps | Sort-Object -Unique)
+
 # ---------- Запис ----------
 $result = [ordered]@{
     type        = 'winsetup-studio-profile'
@@ -389,6 +443,7 @@ $result = [ordered]@{
     hardware    = $hardware
     settings    = $settings
     programs    = $programs
+    matchedApps = $matchedApps
 }
 if ($isAdmin) { $result.features = $feat; $result.bitlocker = $bl; $result.disks = $disks }
 $result.adminRequired = $adminRequired
@@ -886,41 +941,95 @@ const LOCALES={
 const TZ=['FLE Standard Time','Central Europe Standard Time','Central European Standard Time','W. Europe Standard Time','Romance Standard Time','GTB Standard Time','E. Europe Standard Time','Turkish Standard Time','Russian Standard Time','GMT Standard Time','UTC','Azores Standard Time','Arabian Standard Time','India Standard Time','China Standard Time','Korea Standard Time','Tokyo Standard Time','AUS Eastern Standard Time','US Eastern Standard Time','US Pacific Standard Time'];
 const LANG_OPTS=[['bg-BG','Български'],['en-US','English (US)'],['en-GB','English (UK)'],['de-DE','Deutsch'],['fr-FR','Français'],['it-IT','Italiano'],['es-ES','Español'],['pt-BR','Português (BR)'],['nl-NL','Nederlands'],['sv-SE','Svenska'],['pl-PL','Polski'],['hu-HU','Magyar'],['cs-CZ','Čeština'],['ro-RO','Română'],['el-GR','Ελληνικά'],['tr-TR','Türkçe'],['ru-RU','Русский'],['uk-UA','Українська'],['sr-Latn-RS','Srpski'],['mk-MK','Македонски'],['ja-JP','日本語'],['ko-KR','한국어'],['zh-CN','中文(简体)']];
 
-/* Каталог приложения за авто-инсталация (winget) — олекотен WinUtil */
+/* Каталог приложения за авто-инсталация (winget) — идеи от WinUtil, олекотено */
 const APPCATALOG=[
  {cat:'🌐 Браузъри',items:[
    {id:'Google.Chrome',n:'Google Chrome',h:'най-разпространеният браузър'},
    {id:'Mozilla.Firefox',n:'Mozilla Firefox',h:'независим, поверителност-ориентиран'},
-   {id:'Brave.Brave',n:'Brave',h:'със вграден блокер на реклами'}]},
+   {id:'Brave.Brave',n:'Brave',h:'със вграден блокер на реклами'},
+   {id:'Vivaldi.Vivaldi',n:'Vivaldi',h:'за настроенчиви потребители'}]},
  {cat:'📦 Файлове и архиви',items:[
    {id:'7zip.7zip',n:'7-Zip',h:'архиватор — задължителен'},
    {id:'voidtools.Everything',n:'Everything',h:'мгновено търсене на файлове по целия диск'},
-   {id:'AntibodySoftware.WizTree',n:'WizTree',h:'какво заема мястото на диска'}]},
+   {id:'AntibodySoftware.WizTree',n:'WizTree',h:'какво заема мястото на диска'},
+   {id:'Rufus.Rufus',n:'Rufus',h:'запис на ISO на флашка'}]},
  {cat:'🎬 Медия',items:[
    {id:'VideoLAN.VLC',n:'VLC',h:'възпроизвежда всичко'},
    {id:'IrfanView.IrfanView',n:'IrfanView',h:'лек гледач на изображения'},
-   {id:'foobar2000.foobar2000',n:'foobar2000',h:'минималистичен музикален плеър'}]},
+   {id:'foobar2000.foobar2000',n:'foobar2000',h:'минималистичен музикален плеър'},
+   {id:'Audacity.Audacity',n:'Audacity',h:'аудио редактор'},
+   {id:'OBSProject.OBSStudio',n:'OBS Studio',h:'запис и стрийм на екрана'}]},
  {cat:'📄 Документи',items:[
    {id:'Notepad++.Notepad++',n:'Notepad++',h:'текстов редактор — много полезен'},
    {id:'LibreOffice.LibreOffice',h:'Word/Excel алтернатива, безплатна',n:'LibreOffice'},
    {id:'SumatraPDF.SumatraPDF',n:'SumatraPDF',h:'бърз PDF четец'},
-   {id:'Adobe.Acrobat.Reader.64-bit',n:'Adobe Acrobat Reader',h:'стандартният PDF четец'}]},
+   {id:'Adobe.Acrobat.Reader.64-bit',n:'Adobe Acrobat Reader',h:'стандартният PDF четец'},
+   {id:'KDE.Krita',n:'Krita',h:'рисуване и цифрово изкуство'}]},
  {cat:'🛠 Разработка',items:[
    {id:'Microsoft.PowerShell',n:'PowerShell 7',h:'модерният PowerShell (pwsh)'},
    {id:'Microsoft.VisualStudioCode',n:'VS Code',h:'редактор за код и текст'},
    {id:'Git.Git',n:'Git',h:'версиониране на код'},
-   {id:'Python.Python.3.12',n:'Python 3.12',h:'език за скриптове'}]},
+   {id:'Python.Python.3.12',n:'Python 3.12',h:'език за скриптове'},
+   {id:'OpenJS.NodeJS.LTS',n:'Node.js LTS',h:'JavaScript среда'},
+   {id:'Docker.DockerDesktop',n:'Docker Desktop',h:'контейнери (Pro+, изисква WSL2)'},
+   {id:'Postman.Postman',n:'Postman',h:'API тестване'}]},
+ {cat:'🌐 Мрежови инструменти',items:[
+   {id:'WiresharkFoundation.Wireshark',n:'Wireshark',h:'анализ на мрежовия трафик'},
+   {id:'PuTTY.PuTTY',n:'PuTTY',h:'SSH/Telnet клиент'},
+   {id:'WinSCP.WinSCP',n:'WinSCP',h:'SFTP/SCP файлов трансфер'},
+   {id:'Insecure.Nmap',n:'Nmap',h:'сканиране на портове и мрежи'},
+   {id:'famatech.AdvancedIPScanner',n:'Advanced IP Scanner',h:'сканиране на локална мрежа'},
+   {id:'qBittorrent.qBittorrent',n:'qBittorrent',h:'торент клиент без реклами'},
+   {id:'FileZilla.FileZilla',n:'FileZilla',h:'FTP клиент'}]},
  {cat:'🖥 Комфорт',items:[
    {id:'ShareX.ShareX',n:'ShareX',h:'скрийншоти и запис — супер мощен'},
+   {id:'Microsoft.PowerToys',n:'PowerToys',h:'официални ултитки от Microsoft'},
    {id:'Discord.Discord',n:'Discord',h:'гласови чатове'},
    {id:'TelegramMessenger.TelegramDesktop',n:'Telegram',h:'месинджър'},
-   {id:'Zoom.Zoom',n:'Zoom',h:'видео срещи'}]},
+   {id:'Zoom.Zoom',n:'Zoom',h:'видео срещи'},
+   {id:'SlackTechnologies.Slack',n:'Slack',h:'офис чат'},
+   {id:'Notion.Notion',n:'Notion',h:'бележки и вики'},
+   {id:'TeamViewer.TeamViewer',n:'TeamViewer',h:'дистанционна помощ'},
+   {id:'AnyDesk.AnyDesk',n:'AnyDesk',h:'дистанционна помощ, лек'}]},
  {cat:'🎮 Игри и медиа',items:[
    {id:'Valve.Steam',n:'Steam',h:'игрална платформа'},
-   {id:'Spotify.Spotify',n:'Spotify',h:'музика'}]},
- {cat:'📡 Мрежа',items:[
-   {id:'qBittorrent.qBittorrent',n:'qBittorrent',h:'торент клиент без реклами'}]}
+   {id:'Spotify.Spotify',n:'Spotify',h:'музика'}]}
 ];
+
+/* Профили по роля — 1 клик прилага приложения + препоръчителни настройки */
+const ROLEPRESETS=[
+ {id:'home',ic:'🏠',n:'Домашен',d:'Браузър, VLC, 7-Zip, Acrobat + лек debloat, без Bing/реклами. За лична машина.',
+  apps:{'Google.Chrome':1,'7zip.7zip':1,'VideoLAN.VLC':1,'Adobe.Acrobat.Reader.64-bit':1},
+  set:{appsPreset:'light',t_bing:1,t_ads:1,t_tailored:1,t_taskbar:1,t_contextmenu:1,t_explorer:1}},
+ {id:'office',ic:'🏢',n:'Офис/служебен',d:'LibreOffice, Acrobat, Zoom/Slack/Notion + отложени feature ъпдейти (14 дни). Без агресивен debloat.',
+  apps:{'LibreOffice.LibreOffice':1,'Adobe.Acrobat.Reader.64-bit':1,'SumatraPDF.SumatraPDF':1,'Zoom.Zoom':1,'SlackTechnologies.Slack':1,'Notion.Notion':1,'7zip.7zip':1},
+  set:{appsPreset:'none',t_wudefer:'14',t_taskbar:1,t_ads:1}},
+ {id:'sysadmin',ic:'🖥',n:'Сисадмин',d:'Hyper-V, WSL2, PS7, Git, VS Code, Everything, ShareX + телеметрия изключена.',
+  apps:{'Microsoft.PowerShell':1,'Microsoft.VisualStudioCode':1,'Git.Git':1,'voidtools.Everything':1,'ShareX.ShareX':1,'7zip.7zip':1,'Notepad++.Notepad++':1},
+  set:{f_hyperv:1,f_wsl:1,appsPreset:'standard',t_telemetry:1,t_bing:1,t_explorer:1,t_gamebar:1}},
+ {id:'net',ic:'🌐',n:'Мрежов инженер',d:'Wireshark, PuTTY, WinSCP, Nmap, Advanced IP Scanner, FileZilla, PS7 + WSL2.',
+  apps:{'WiresharkFoundation.Wireshark':1,'PuTTY.PuTTY':1,'WinSCP.WinSCP':1,'Insecure.Nmap':1,'famatech.AdvancedIPScanner':1,'FileZilla.FileZilla':1,'Microsoft.PowerShell':1},
+  set:{f_wsl:1,appsPreset:'light',t_telemetry:1}},
+ {id:'dev',ic:'👨‍💻',n:'Разработчик',d:'VS Code, Git, Python, Node, Docker, WSL2, Sandbox, Postman + минимални ограничения.',
+  apps:{'Microsoft.VisualStudioCode':1,'Git.Git':1,'Python.Python.3.12':1,'OpenJS.NodeJS.LTS':1,'Docker.DockerDesktop':1,'Microsoft.PowerShell':1,'Postman.Postman':1,'Notepad++.Notepad++':1},
+  set:{f_wsl:1,f_sandbox:1,appsPreset:'none',t_bing:1}}
+];
+function applyRolePreset(id){
+  if(id==='recommended'){
+    S_st.appsMap=Object.assign({},defaults.appsMap);
+    for(const k of ['Google.Chrome','7zip.7zip','VideoLAN.VLC','Notepad++.Notepad++'])S_st.appsMap[k]=1;
+    S_st.appsPreset='light';
+    for(const k of ['t_bing','t_ads','t_tailored','t_taskbar','t_explorer'])S_st[k]=1;
+    afterChange();
+    toast('✨ Препоръчителният пакет е приложен — прегледай и коригирай.');
+    return;
+  }
+  const p=ROLEPRESETS.find(x=>x.id===id);if(!p)return;
+  S_st.appsMap=Object.assign({},p.apps);
+  for(const k in p.set){if(k in S_st)S_st[k]=p.set[k]}
+  afterChange();
+  toast('Профил „'+p.n+'“ приложен — прегледай и коригирай свободно.');
+}
 
 /* ---------- каталог групи и настройки ----------
    level: green | amber | red   core: показва се и в Базов изглед
@@ -935,8 +1044,9 @@ const GROUPS=[
  {id:'features',title:'7. Компоненти',ic:'🧰',desc:'Hyper-V, WSL, .NET'},
  {id:'apps',title:'8. Приложения',ic:'📦',desc:'Авто-инсталация при първия вход (каталог + winget)'},
  {id:'debloat',title:'9. Debloat и твикс',ic:'🧹',desc:'Приложения и настройки след входа'},
- {id:'drivers',title:'10. Драйвери и ъпдейти',ic:'🛠️',desc:'Драйвери от флашката, Dynamic Update'},
- {id:'network',title:'11. Мрежа и домейн',ic:'📡',desc:'Име на компютъра, Workgroup/Domain'}
+ {id:'drivers',title:'10. Драйвери и ъпдейти',ic:'🛠️',desc:'Драйвери от флашката, Dynamic Update, пакети по модел'},
+ {id:'network',title:'11. Мрежа и домейн',ic:'📡',desc:'Име на компютъра, Workgroup/Domain'},
+ {id:'fixes',title:'12. Поправки (Fixes)',ic:'🧯',desc:'Ремонти за проблемни инсталации — по избор'}
 ];
 
 const S=[
@@ -1110,6 +1220,20 @@ const S=[
  when:'Когато ISO-ът е стар и не искаш ден ъпдейти след инсталация.',risk:'🟠 Инсталацията вече НЕ е чисто офлайн.'},
 {id:'wustart',g:'drivers',t:'toggle',lvl:'green',def:false,label:'Провери за ъпдейти при първия вход',
  what:'Стартира Windows Update скан веднага след първия вход.',when:'Винаги полезно.',risk:'Няма.'},
+{id:'appsupgrade',g:'apps',t:'toggle',lvl:'amber',def:false,label:'Обнови вече инсталираните (winget upgrade --all)',
+ what:'Освен инсталацията на избраните — изпълнява и winget upgrade --all: обновява ВСИЧКИ вече инсталирани winget-управлявани програми до последна версия.',
+ when:'За машини, които вече се ползват (не чиста инсталация).',risk:'🟠 Обновява и програми, които не си избирал изрично — на критични машини ползвай внимателно.'},
+
+/* ===== 12. Поправки ===== */
+{id:'fx_wurepair',g:'fixes',t:'toggle',lvl:'amber',def:false,label:'Ремонт на Windows Update',
+ what:'Стопва услугите wuauserv/bits/cryptsvc, преименува SoftwareDistribution и catroot2 (нулира кеша на Update), стартира услугите пак и вика usoclient StartScan. За машини, където Update е зациклил.',
+ when:'„Ремонтна“ инсталация или образ за машини със счупен Update.',risk:'🟠 Изтрива кеша на изтеглените ъпдейти (те се теглят пак). На чиста инсталация не е нужен.'},
+{id:'fx_winsock',g:'fixes',t:'toggle',lvl:'amber',def:false,label:'Нулирай мрежовия стек (winsock/IP)',
+ what:'netsh winsock reset + netsh int ip reset + ipconfig /flushdns — при счупен интернет, странни DNS проблеми или остатъци от VPN софтуер.',
+ when:'Ремонтни образи.',risk:'🟠 Изисква рестарт; мрежовите настройки (статични IP!) се губят.'},
+{id:'fx_sfc',g:'fixes',t:'toggle',lvl:'amber',def:false,label:'SFC /scannow при първия вход',
+ what:'sfc /scannow — проверява и ремонтира системните файлове. Дълго (5–20 минути).',
+ when:'Ремонтни образи.',risk:'Няма — само четене/ремонт на системни файлове.'},
 
 /* ===== 11. Мрежа и домейн ===== */
 {id:'computername',g:'network',t:'text',lvl:'amber',core:1,def:'',label:'Име на компютъра',
@@ -1182,6 +1306,23 @@ function warnHTML(s){
   const red=w[0]==='!';
   return `<div class="wbox ${red?'red':'amber'}">${red?w.slice(1):w}</div>`;
 }
+function driversToolHTML(){
+  return `<div class="appcat">🔧 Драйвер пакети по модел (официални източници)</div>
+  <div class="card lv-amber">
+    <div class="row">
+      <span class="dot" style="background:var(--amber)"></span>
+      <span class="lbl">Намери и свали драйвер пакет<span class="pill p-amber">РАЗШИРЕНА</span></span>
+      <select id="drvVendor" style="min-width:110px"><option value="lenovo">Lenovo</option><option value="dell">Dell</option><option value="hp">HP</option></select>
+      <input type="text" id="drvModel" placeholder="модел, напр. ThinkPad E590" style="min-width:180px">
+      <button class="mbtn sec" id="drvSearch">🔍 Официална търсачка</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <input type="text" id="drvUrl" placeholder="директен https URL на пакета (download.lenovo.com/… , download.dell.com/…)" style="flex:1;min-width:280px">
+      <button class="mbtn" id="drvDownload">⚡ Свали пакета</button>
+    </div>
+    <p class="hint">Флоу: 🔍 отваря официалната търсачка за модела → намери пакета (.zip/.cab/.iso) → копирай директния линк → ⚡ сваля в <b>Downloads\\WinSetupStudio-drivers\\</b> → копирай в <b>\\drivers</b> на флашката (група 10 го инсталира при първия вход). Познатите модели добавям по заявка — списъкът расте.</p>
+  </div>`;
+}
 function cardHTML(s){
   if(s.t==='note')return `<div class="note" data-card="${s.id}"><b>${esc(s.label)}</b> — ${esc(s.what)}</div>`;
   const pill=s.lvl==='green'?'БАЗОВА':s.lvl==='amber'?'РАЗШИРЕНА':'ОПАСНА';
@@ -1229,6 +1370,12 @@ function accountsHTML(){
 function appsHTML(){
   let h='<div class="grouph" id="sec-apps"><h2>📦 8. Приложения</h2><span class="gdesc">Авто-инсталация при първия вход (каталог + winget)</span></div>';
   h+='<div class="note">Отметнатите се инсталират <b>автоматично при първия вход</b> през winget (тихо, с приемане на лицензи). Работи като авто-скрипт тип „Крис Титус“, но олекотено: избираш само това, което ти трябва. Нужен е интернет при първия вход.</div>';
+  h+='<div class="appcat">👤 Профили по роля — 1 клик</div>';
+  h+=`<div class="appitem"><span class="dot" style="background:var(--green)"></span><span class="lbl">✨ Препоръчителен пакет</span><span class="hint" style="flex:2;min-width:180px">безопасни твиксове + лек debloat + 4 базови приложения — за всеки комп</span><button class="mbtn sec" data-role="recommended">Приложи</button></div>`;
+  ROLEPRESETS.forEach(p=>{
+    h+=`<div class="appitem"><span style="font-size:16px">${p.ic}</span><span class="lbl">${esc(p.n)}</span><span class="hint" style="flex:2;min-width:180px">${esc(p.d)}</span><button class="mbtn sec" data-role="${p.id}">Приложи</button></div>`;
+  });
+  h+='<div class="appcat">📦 Каталог приложения (winget)</div>';
   APPCATALOG.forEach(cat=>{
     h+=`<div class="appcat">${esc(cat.cat)}</div>`;
     cat.items.forEach(it=>{
@@ -1281,6 +1428,7 @@ function renderContent(){
     const changed=S.filter(x=>x.g===g.id&&JSON.stringify(S_st[x.id])!==JSON.stringify(defaults[x.id])).length;
     html+=`<div class="grouph" id="sec-${g.id}"><h2>${g.ic} ${esc(g.title)}</h2><span class="gdesc">${esc(g.desc)}</span>${changed?`<span class="badge" style="color:var(--blue)">променени: ${changed}</span>`:''}</div>`;
     html+=items.map(cardHTML).join('');
+    if(g.id==='drivers'&&!q)html+=driversToolHTML();
   });
   if(!html)html='<div class="note">Няма настройки, отговарящи на търсенето.</div>';
   $('content').innerHTML=html;
@@ -1339,6 +1487,26 @@ function bindEvents(){
     if(e.target.dataset&&e.target.dataset.eye!==undefined){
       const inp=e.target.parentElement.querySelector('input');
       if(inp)inp.type=(inp.type==='password')?'text':'password';
+      return;
+    }
+    if(e.target.dataset&&e.target.dataset.role){applyRolePreset(e.target.dataset.role);return}
+    if(e.target.id==='drvSearch'){
+      const m=$('drvModel')?$('drvModel').value.trim():'';if(!m){toast('Въведи модел първо.');return}
+      const v=$('drvVendor').value;
+      const urls={lenovo:'https://support.lenovo.com/us/en/search?query=',dell:'https://www.dell.com/en-us/search?query=',hp:'https://support.hp.com/us-en/search?q='};
+      window.open((urls[v]||urls.lenovo)+encodeURIComponent(m),'_blank');
+      return;
+    }
+    if(e.target.id==='drvDownload'){
+      const url=$('drvUrl').value.trim();
+      if(!/^https:\/\//.test(url)){toast('Постави директния https URL на пакета.');return}
+      e.target.disabled=true;e.target.textContent='⏳ Стартирам…';
+      fetch(HELPER.base+'api/drivers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:url})})
+        .then(r=>r.json()).then(j=>{
+          if(j.error){toast('Грешка: '+j.error)}
+          else{toast('Свалянето стартира в PowerShell прозореца.');}
+        }).catch(err=>toast('Helper грешка: '+err.message))
+        .finally(()=>{e.target.disabled=false;e.target.textContent='⚡ Свали пакета'});
       return;
     }
     const del=e.target.dataset&&e.target.dataset.accdel;
@@ -1427,6 +1595,7 @@ function buildTweaksScript(){
     const ids=apps.map(x=>`'${x.replace(/'/g,"''")}'`).join(',');
     P.push(`Sec 'winget' { Start-Sleep 10; foreach($i in @(${ids})){ W \"winget $i\"; & winget install --id $i --silent --accept-package-agreements --accept-source-agreements | Out-Null } }`);
   }
+  if(val('appsupgrade'))P.push("Sec 'winget-upgrade' { & winget upgrade --all --silent --accept-package-agreements --accept-source-agreements | Out-Null }");
   const APP_LIGHT=['Microsoft.Copilot','MSTeams','MicrosoftTeams','Microsoft.News','Microsoft.SolitaireCollection','Clipchamp.Clipchamp','Microsoft.OutlookForWindows','Microsoft.BingNews','Microsoft.BingWeather','Microsoft.BingSearch','Microsoft.GetHelp','Microsoft.Getstarted','Microsoft.MicrosoftOfficeHub'];
   const APP_MORE=['Microsoft.GamingApp','Microsoft.XboxApp','Microsoft.XboxGamingOverlay','Microsoft.XboxIdentityProvider','Microsoft.XboxSpeechToTextOverlay','Microsoft.ZuneMusic','Microsoft.ZuneVideo','Microsoft.WindowsMaps','Microsoft.YourPhone','Microsoft.WindowsFeedbackHub','Microsoft.MicrosoftStickyNotes','Microsoft.ToDo','Microsoft.People','Microsoft.PowerAutomateDesktop','Microsoft.MixedReality.Portal','Microsoft.SkypeApp','Microsoft.Wallet','Microsoft.WindowsAlarms','Microsoft.WindowsSoundRecorder','Microsoft.549981C3F5F10'];
   const APP_KEEP=['Microsoft.WindowsStore','Microsoft.WindowsCalculator','Microsoft.WindowsPhotos','Microsoft.WindowsNotepad','Microsoft.WindowsTerminal','Microsoft.DesktopAppInstaller','Microsoft.WindowsSecHealthUI','Microsoft.HEIFImageExtension','Microsoft.WebpImageExtension','Microsoft.VP9VideoExtensions','Microsoft.AV1VideoExtension','Microsoft.WebMediaExtensions','Microsoft.RawImageExtension','Microsoft.HEVCVideoExtension'];
@@ -1458,6 +1627,9 @@ function buildTweaksScript(){
   if(val('t_powerplan'))P.push("Sec 'powerplan' { & powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c | Out-Null }");
   const defer=String(val('t_wudefer')||'0');
   if(defer!=='0')P.push(`Sec 'wu-defer' { reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\" /v DeferFeatureUpdatesPeriodInDays /t REG_DWORD /d ${defer} /f | Out-Null; reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\" /v DeferQualityUpdatesPeriodInDays /t REG_DWORD /d 7 /f | Out-Null }`);
+  if(val('fx_wurepair'))P.push("Sec 'wu-repair' { foreach($s in 'wuauserv','bits','cryptsvc'){ Stop-Service $s -Force -ErrorAction SilentlyContinue }; Rename-Item \"$env:WINDIR\\SoftwareDistribution\" 'SoftwareDistribution.old' -ErrorAction SilentlyContinue; Rename-Item \"$env:WINDIR\\System32\\catroot2\" 'catroot2.old' -ErrorAction SilentlyContinue; foreach($s in 'cryptsvc','bits','wuauserv'){ Start-Service $s -ErrorAction SilentlyContinue }; & usoclient StartScan | Out-Null }");
+  if(val('fx_winsock'))P.push("Sec 'winsock' { & netsh winsock reset | Out-Null; & netsh int ip reset | Out-Null; & ipconfig /flushdns | Out-Null }");
+  if(val('fx_sfc'))P.push("Sec 'sfc' { & sfc /scannow | Out-Null }");
   if(val('wustart'))P.push("Sec 'wu-scan' { try { (New-Object -ComObject Microsoft.Update.AutoUpdate).DetectNow() } catch { & usoclient StartInteractiveScan } }");
   if(P.length>5){
     const shellTweaks=val('t_contextmenu')||val('t_taskbar')||val('t_taskbarleft')||val('t_explorer');
@@ -1631,7 +1803,7 @@ ${val('domainou')?'          <MachineObjectOU>'+esc(val('domainou'))+'</MachineO
 
   const xml=
 `<?xml version="1.0" encoding="utf-8"?>
-<!-- Generated by WinSetup Studio 1.0.0 (${new Date().toLocaleString('bg-BG')}) -->
+<!-- Generated by WinSetup Studio 1.2.0 (${new Date().toLocaleString('bg-BG')}) -->
 <!-- Сложи този файл в ROOT (главната папка) на инсталационната флашка. -->
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
 ${pass('windowsPE',[peIntl,setupComp])}
@@ -1776,6 +1948,12 @@ function importProfileText(txt,name){
   if(o&&Array.isArray(o.accounts)&&o.accounts.length){S_st.accounts=o.accounts;n++}
   else if(o&&o.settings&&o.settings.username){S_st.accounts=[{name:o.settings.username,display:o.settings.displayname||'',password:o.settings.userpassword||'',admin:o.settings.useradmin!==false,desc:o.settings.userdesc||''}];n++}
   if(o&&o.appsMap){S_st.appsMap=o.appsMap;n++}
+  if(o&&o.matchedApps&&Array.isArray(o.matchedApps)){
+    let m=0;
+    for(const id of o.matchedApps){if(APPCATALOG.some(c=>c.items.some(i=>i.id===id))){S_st.appsMap[id]=1;m++}}
+    if(m)setTimeout(()=>toast('От скана: '+m+' приложения от каталога вече са на компа — отбелязани.'),300);
+    n++;
+  }
   if(o&&o.settings&&'wingetapps' in o.settings){S_st.wingetapps=o.settings.wingetapps;n++}
   /* език без подредби → изчисли подредбите автоматично */
   if(o&&o.settings&&'uilanguage' in o.settings&&!("inputlocale" in o.settings)&&LOCALES[S_st.uilanguage]){S_st.inputlocale=LOCALES[S_st.uilanguage]}

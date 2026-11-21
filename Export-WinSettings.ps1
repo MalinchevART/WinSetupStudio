@@ -137,6 +137,60 @@ else {
     Write-Host 'Пуснете отново с "Като администратор", ако искате пълните данни.' -ForegroundColor Yellow
 }
 
+# ---------- Съпоставяне с winget каталога на WinSetup Studio ----------
+$wingetMap = @{
+    'Google.Chrome'                    = 'Google Chrome'
+    'Mozilla.Firefox'                  = 'Mozilla Firefox'
+    'Brave.Brave'                      = 'Brave'
+    'Vivaldi.Vivaldi'                  = 'Vivaldi'
+    '7zip.7zip'                        = '7-Zip'
+    'voidtools.Everything'             = 'Everything'
+    'AntibodySoftware.WizTree'         = 'WizTree'
+    'Rufus.Rufus'                      = 'Rufus'
+    'VideoLAN.VLC'                     = 'VLC media player'
+    'IrfanView.IrfanView'              = 'IrfanView'
+    'foobar2000.foobar2000'            = 'foobar2000'
+    'Audacity.Audacity'                = 'Audacity'
+    'OBSProject.OBSStudio'             = 'OBS Studio'
+    'Notepad++.Notepad++'              = 'Notepad++'
+    'LibreOffice.LibreOffice'          = 'LibreOffice'
+    'SumatraPDF.SumatraPDF'            = 'SumatraPDF'
+    'Adobe.Acrobat.Reader.64-bit'      = 'Adobe Acrobat'
+    'KDE.Krita'                        = 'Krita'
+    'Microsoft.PowerShell'             = 'PowerShell 7'
+    'Microsoft.VisualStudioCode'       = 'Visual Studio Code'
+    'Git.Git'                          = 'Git'
+    'Python.Python.3.12'               = 'Python 3.12'
+    'OpenJS.NodeJS.LTS'                = 'Node.js'
+    'Docker.DockerDesktop'             = 'Docker Desktop'
+    'Postman.Postman'                  = 'Postman'
+    'WiresharkFoundation.Wireshark'    = 'Wireshark'
+    'PuTTY.PuTTY'                      = 'PuTTY'
+    'WinSCP.WinSCP'                    = 'WinSCP'
+    'Insecure.Nmap'                    = 'Nmap'
+    'famatech.AdvancedIPScanner'       = 'Advanced IP Scanner'
+    'qBittorrent.qBittorrent'          = 'qBittorrent'
+    'FileZilla.FileZilla'              = 'FileZilla'
+    'ShareX.ShareX'                    = 'ShareX'
+    'Microsoft.PowerToys'              = 'PowerToys'
+    'Discord.Discord'                  = 'Discord'
+    'TelegramMessenger.TelegramDesktop'= 'Telegram'
+    'Zoom.Zoom'                        = 'Zoom'
+    'SlackTechnologies.Slack'          = 'Slack'
+    'Notion.Notion'                    = 'Notion'
+    'TeamViewer.TeamViewer'            = 'TeamViewer'
+    'AnyDesk.AnyDesk'                  = 'AnyDesk'
+    'Valve.Steam'                      = 'Steam'
+    'Spotify.Spotify'                  = 'Spotify'
+}
+$matchedApps = @()
+foreach ($k in $wingetMap.Keys) {
+    $needle = $wingetMap[$k]
+    $hit = $programs | Where-Object { $_ -like "*$needle*" } | Select-Object -First 1
+    if ($hit) { $matchedApps += $k }
+}
+$matchedApps = @($matchedApps | Sort-Object -Unique)
+
 # ---------- Запис ----------
 $result = [ordered]@{
     type        = 'winsetup-studio-profile'
@@ -146,6 +200,7 @@ $result = [ordered]@{
     hardware    = $hardware
     settings    = $settings
     programs    = $programs
+    matchedApps = $matchedApps
 }
 if ($isAdmin) { $result.features = $feat; $result.bitlocker = $bl; $result.disks = $disks }
 $result.adminRequired = $adminRequired
