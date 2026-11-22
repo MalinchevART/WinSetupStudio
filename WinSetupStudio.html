@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>WinSetup Studio 1.3 — генератор + след инсталация на autounattend.xml</title>
+<title>WinSetup Studio 1.4 — autounattend.xml generator (BG/EN) на autounattend.xml</title>
 <style>
 :root{
   --bg:#f4f6f9; --card:#ffffff; --ink:#1d2430; --mut:#5c6675; --line:#dde3ec;
@@ -189,29 +189,30 @@ aside#right{position:sticky;top:0;border-left:1px solid var(--line);height:100vh
 <body>
 
 <header>
-  <div class="logo">⚙️ WinSetup Studio <span class="ver">1.3.0</span><span id="apiBadge" class="ver" style="display:none"></span></div>
-  <div class="sub">Генератор на <b>autounattend.xml</b> — инсталирай Windows без въпроси, вече настроен. Работи изцяло офлайн; нищо не се изпраща никъде.</div>
-  <button class="btn primary" id="topGen">💾 Генерирай autounattend.xml</button>
-  <button class="btn" id="btnWizard">🧙 Етапи</button>
-  <button class="btn" id="btnReadPC">🖥 Прочети този комп</button>
-  <button class="btn" id="btnIso">⬇ Свали Windows</button>
-  <button class="btn" id="btnUsb">🔌 Флашка</button>
-  <button class="btn" id="btnHelp">❓ Помощ</button>
+  <div class="logo">⚙️ WinSetup Studio <span class="ver">1.4.0</span><span id="apiBadge" class="ver" style="display:none"></span></div>
+  <div class="sub" data-i18n="appSubtitle">Генератор на <b>autounattend.xml</b> — инсталирай Windows без въпроси, вече настроен. Работи изцяло офлайн; нищо не се изпраща никъде.</div>
+  <button class="btn primary" id="topGen" data-i18n="topGen">💾 Генерирай autounattend.xml</button>
+  <button class="btn" id="btnWizard" data-i18n="btnWizard">🧙 Етапи</button>
+  <button class="btn" id="btnReadPC" data-i18n="btnReadPC">🖥 Прочети този комп</button>
+  <button class="btn" id="btnIso" data-i18n="btnIso">⬇ Свали Windows</button>
+  <button class="btn" id="btnUsb" data-i18n="btnUsb">🔌 Флашка</button>
+  <button class="btn" id="btnHelp" data-i18n="btnHelp">❓ Помощ</button>
+  <button class="btn" id="btnLang" title="BG/EN">🌐 EN</button>
   <button class="btn" id="btnTheme" title="Тъмна/светла тема">☀️</button>
 </header>
 <div id="pwrap"><div id="pbar"></div></div>
 
-<div id="banner">💡 Спомняш ли си „там в главна директория“? Точно така: файлът <b>autounattend.xml</b> се слага в <b>ROOT (главната папка) на инсталационната флашка</b> — Windows Setup го открива и чете сам при стартиране. <button id="bannerMore">Как работи →</button></div>
+<div id="banner"><span data-i18n="banner">💡 Спомняш ли си „там в главна директория“? Точно така: файлът <b>autounattend.xml</b> се слага в <b>ROOT (главната папка) на инсталационната флашка</b> — Windows Setup го открива и чете сам при стартиране.</span> <button id="bannerMore" data-i18n="bannerMore">Как работи →</button></div>
 
 <div id="toolbar">
-  <div class="seg"><button id="mPre" class="on">🧲 Преди инсталация</button><button id="mPost">🔧 След инсталация</button></div>
-  <div class="seg"><button id="vwBase" class="on">Базов изглед</button><button id="vwFull">Подробен изглед</button></div>
-  <input id="q" type="text" placeholder="🔍 Търси настройка… (напр. „парола“, „дялове“, „telemetry“)">
+  <div class="seg"><button id="mPre" class="on" data-i18n="modePre">🧲 Преди инсталация</button><button id="mPost" data-i18n="modePost">🔧 След инсталация</button></div>
+  <div class="seg"><button id="vwBase" class="on" data-i18n="viewBase">Базов изглед</button><button id="vwFull" data-i18n="viewFull">Подробен изглед</button></div>
+  <input id="q" type="text" data-i18n-ph="searchPlaceholder" placeholder="🔍 Търси настройка… (напр. „парола“, „дялове“, „telemetry“)">
   <span id="countInfo" style="color:var(--mut);font-size:12px"></span>
   <span style="flex:1"></span>
-  <button class="mbtn sec" id="btnImport">📥 Импорт профил</button>
-  <button class="mbtn sec" id="btnSaveProf">📤 Запази профил</button>
-  <button class="mbtn sec" id="btnReset" title="Връща всички настройки по подразбиране">↺ Нулирай</button>
+  <button class="mbtn sec" id="btnImport" data-i18n="importProfile">📥 Импорт профил</button>
+  <button class="mbtn sec" id="btnSaveProf" data-i18n="saveProfile">📤 Запази профил</button>
+  <button class="mbtn sec" id="btnReset" data-i18n="reset" data-i18n-title="resetTitle" title="Връща всички настройки по подразбиране">↺ Нулирай</button>
 </div>
 
 <div id="layout">
@@ -230,9 +231,9 @@ aside#right{position:sticky;top:0;border-left:1px solid var(--line);height:100vh
 
   <aside id="right">
     <div id="rtabs">
-      <button data-tab="sum" class="on">📋 Резюме</button>
-      <button data-tab="xml">📄 XML</button>
-      <button data-tab="help">❓ Помощ</button>
+      <button data-tab="sum" class="on" data-i18n="tabSummary">📋 Резюме</button>
+      <button data-tab="xml" data-i18n="tabXml">📄 XML</button>
+      <button data-tab="help" data-i18n="tabHelp">❓ Помощ</button>
     </div>
     <div id="rbody">
       <div id="tab-sum"></div>
@@ -920,6 +921,737 @@ catch {
 </script>
 
 <script>
+const I18N_EN = {
+  ui: {
+    // ---------- page / header ----------
+    docTitle: 'WinSetup Studio 1.4 — autounattend.xml generator + post-install',
+    appSubtitle: 'autounattend.xml generator — install Windows with no questions, already configured. Works fully offline; nothing is sent anywhere.',
+    topGen: '💾 Generate autounattend.xml',
+    btnWizard: '🧙 Stages',
+    btnReadPC: "🖥 Read this PC's settings",
+    btnIso: '⬇ Download Windows',
+    btnUsb: '🔌 Flash drive',
+    btnHelp: '❓ Help',
+    btnThemeTitle: 'Dark/light theme',
+    // ---------- banner ----------
+    banner: '💡 Remember \u201cthere, in the root directory\u201d? Exactly: the autounattend.xml file goes into the ROOT (top-level folder) of the installation flash drive — Windows Setup detects and reads it by itself at startup.',
+    bannerMore: 'How it works →',
+    // ---------- toolbar ----------
+    modePre: '🧲 Pre-install',
+    modePost: '🔧 Post-install',
+    viewBase: 'Basic view',
+    viewFull: 'Detailed view',
+    searchPlaceholder: '🔍 Search a setting… (e.g. \u201cpassword\u201d, \u201cpartitions\u201d, \u201ctelemetry\u201d)',
+    importProfile: '📥 Import profile',
+    saveProfile: '📤 Save profile',
+    reset: '↺ Reset',
+    resetTitle: 'Restores all settings to their defaults',
+    resetConfirm: 'Reset ALL settings to their defaults?',
+    resetToast: 'Settings have been reset.',
+    countInfoTpl: '{visible} visible settings · {total} total in {groups} groups',
+    changedBadge: 'changed: {n}',
+    // ---------- drag & drop ----------
+    dropOverlay: '⬇ Drop the JSON profile here',
+    dropInvalidJson: 'You must drop a .json file (a profile).',
+    // ---------- sidebar legend ----------
+    legendTitle: 'Legend (complexity / risk)',
+    legendBasic: 'Basic — safe for anyone',
+    legendAdvanced: 'Advanced — read the explanation',
+    legendDangerous: 'Dangerous — be careful!',
+    legendCounter: 'The counter = how many settings differ from the defaults. The profile can also be dragged (drag&drop) onto the app.',
+    // ---------- right panel tabs ----------
+    tabSummary: '📋 Summary',
+    tabXml: '📄 XML',
+    tabHelp: '❓ Help',
+    xmlLiveHint: 'Live preview of the file that will be generated.',
+    // ---------- cards ----------
+    pillBasic: 'BASIC',
+    pillAdvanced: 'ADVANCED',
+    pillDangerous: 'DANGEROUS',
+    whatIsThis: 'What is this? Detailed explanation',
+    whatItDoes: 'What it does:',
+    whenYouWantIt: 'When you want it:',
+    riskNotes: 'Risk / notes:',
+    noMatch: 'No settings match your search.',
+    // ---------- accounts (group 5) ----------
+    accountsNote: 'The local accounts created here are written directly into the file — OOBE asks nothing and does NOT request a Microsoft account. AutoLogon signs in with the first administrator once, so the tweaks can run.',
+    accAdmin: 'ADMINISTRATOR',
+    accStandard: 'STANDARD',
+    accRemove: '✕ Remove',
+    accNameLabel: 'Username (Latin letters, no spaces)',
+    accDisplayLabel: 'Display name (Cyrillic allowed)',
+    accPasswordLabel: 'Password',
+    accEyeTitle: 'Show/hide password',
+    accAdminRights: 'Administrator rights',
+    accDescLabel: 'Description (optional)',
+    accAddMore: '＋ Add another account (e.g. a standard one for a child/colleague)',
+    // ---------- apps (group 8) ----------
+    appsNote: 'Ticked apps are installed automatically at first logon via winget (silently, accepting licenses). It works like a \u201cChris Titus\u201d-style auto script, but lighter: you pick only what you need. Internet is required at first logon.',
+    rolesHeader: '👤 Role presets — 1 click',
+    recommendedPreset: '✨ Recommended bundle',
+    recommendedDesc: 'safe tweaks + light debloat + 4 basic apps — for any PC',
+    applyBtn: 'Apply',
+    catalogHeader: '📦 App catalog (winget)',
+    extraWingetIds: 'Additional winget IDs (comma-separated)',
+    extraWingetPlaceholder: 'e.g. 7zip.7zip, VideoLAN.VLC',
+    extraWingetWhat: 'Appended to the ticked list — at first logon the script runs winget install --id <ID> for each one (silently, accepting licenses).',
+    extraWingetWhen: 'A program that is not in the catalog. Find its ID with the command \u201cwinget search name\u201d.',
+    extraWingetRisk: '🟠 Internet is required at first logon. Wrong IDs are simply skipped and logged.',
+    recommendedAppliedToast: '✨ The recommended bundle has been applied — review and adjust.',
+    roleAppliedToast: 'The \u201c{name}\u201d preset has been applied — review and adjust freely.',
+    // ---------- drivers tool ----------
+    driversByModel: '🔧 Driver packages by model (official sources)',
+    findDriverPkg: 'Find and download a driver package',
+    drvModelPlaceholder: 'model, e.g. ThinkPad E590',
+    drvSearchBtn: '🔍 Official search',
+    drvUrlPlaceholder: 'direct https URL of the package (download.lenovo.com/…, download.dell.com/…)',
+    drvDownloadBtn: '⚡ Download package',
+    drvDownloadStarting: '⏳ Starting…',
+    drvFlowHint: 'Flow: 🔍 opens the official search for the model → find the package (.zip/.cab/.iso) → copy the direct link → ⚡ downloads it to Downloads\\WinSetupStudio-drivers\\ → copy it to the \\drivers folder on the flash drive (group 10 installs it at first logon). Known models are added on request — the list keeps growing.',
+    enterModelFirst: 'Enter a model first.',
+    pasteHttpsUrl: 'Paste the direct https URL of the package.',
+    dlStartedPowerShell: 'The download started in the PowerShell window.',
+    helperError: 'Helper error: {msg}',
+    errorPrefix: 'Error: {msg}',
+    // ---------- summary ----------
+    summaryHeading: 'Summary',
+    sumVersion: 'Version',
+    sumEdition: 'Edition',
+    sumLang: 'Language',
+    sumTimezone: 'Time zone',
+    sumBypass: 'Hardware bypass',
+    sumDisks: 'Partitions',
+    sumAccounts: 'Accounts',
+    sumAutologon: 'AutoLogon',
+    sumApps: 'Apps',
+    sumDebloat: 'Debloat',
+    sumDomain: 'Domain',
+    sumTweakScript: 'Tweak script',
+    sumNetwork: 'Network',
+    valNoKey: 'no key',
+    valYes: 'YES',
+    valNo: 'no',
+    valYesLower: 'yes',
+    valNoLower: 'no',
+    valManual: 'manual',
+    valAutoUefi: 'AUTOMATIC (disk 0 will be wiped!)',
+    valAutoBios: 'AUTOMATIC BIOS (will be wiped!)',
+    valAvail: 'first suitable partition',
+    valAccountsNone: '— (will ask in OOBE)',
+    valAutologonYes: 'yes ({user})',
+    valAppsCount: '{n} app(s) (winget)',
+    valNone: 'none',
+    valEnterName: 'enter a name',
+    valWorkgroup: 'Workgroup',
+    valTweakEmbedded: 'will be embedded in the XML (base64)',
+    valTweakNotNeeded: 'not needed',
+    valAutoName: 'auto-name',
+    sumNote: 'The file is called autounattend.xml and goes into the root of the flash drive (next to setup.exe, not inside a folder).',
+    checksOk: '✅ All checks passed. Generate the file and put it in the ROOT of the flash drive.',
+    postBanner: '🔧 \u201cPost-install\u201d mode: the same settings are applied NOW on this PC via the helper (started as admin from WinSetupStudio.cmd).',
+    applyNow: '⚡ Apply NOW on this PC',
+    applyNowStarting: '⏳ Starting…',
+    copyScript: '📋 Copy script',
+    genBtn: '💾 Generate autounattend.xml',
+    copyXml: '📋 Copy XML',
+    applyNoTweaks: 'No tweaks/apps selected to apply.',
+    applyStarted: 'The script started in a PowerShell window — watch the output there.',
+    // ---------- validation ----------
+    errAutoWipe: 'The automatic mode WIPES disk 0 — tick \u201cI confirm\u201d in the \u201cPartitions\u201d group (safety requirement).',
+    errUniqueNames: 'Account names must be unique.',
+    errAccountLatin: 'Account \u201c{name}\u201d: the username must be Latin letters only, without spaces (the display name may be Cyrillic).',
+    errAutologonPassword: 'Automatic logon (AutoLogon) requires a password on the primary account.',
+    warnNoAccount: 'No local account is defined — OOBE will ask for an account (in online mode, a Microsoft account).',
+    warnAutologonNoUser: 'AutoLogon is enabled but there is no user — it will be skipped.',
+    errDomainNoName: 'Domain mode is selected, but no domain name was entered (\u201cNetwork and domain\u201d group).',
+    warnDomainCreds: 'A domain join needs a domain account and password.',
+    warnComputerName: 'Computer name: up to 15 characters, Latin letters/digits/hyphens only.',
+    warnNoKey: 'No key: Setup will pick the edition automatically (BIOS license or the ISO edition).',
+    warnPlaintext: 'The passwords will be stored as PLAIN TEXT in the XML.',
+    warnAggressiveDebloat: 'The aggressive debloat removes almost everything from the Store — use only on known machines.',
+    warnNetworkOOBE: 'Aggressive network mode: there is no internet until first logon (the adapters are re-enabled automatically by the tweaks script).',
+    warnHomeFeatures: 'Hyper-V and Windows Sandbox are missing in Home editions — the feature will not be installed.',
+    warnConX: '25H2/26H2 note: if Setup starts asking questions (the new \u201cConX\u201d mode sometimes ignores the file) — Shift+F10 → \u201csetup.exe /Unattend:X:\\autounattend.xml\u201d. See \u201cHelp\u201d.',
+    warnDynUpdate: 'Dynamic Update: the installation will download updates from the internet (not purely offline).',
+    warnAppsNetworkOOBE: 'Apps are installed at first logon — with the aggressive network mode the network is re-enabled just before that, but it may be slow.',
+    // ---------- generate / copy ----------
+    genHasErrors: 'There are unresolved errors — see \u201cSummary\u201d.',
+    genDone: 'Downloaded: autounattend.xml — put it in the ROOT of the flash drive!',
+    xmlCopied: 'The XML is on the clipboard.',
+    scriptCopied: 'The script is on the clipboard.',
+    copyFailed: 'Copy failed — use the XML button → select manually.',
+    // ---------- profile ----------
+    profileSaved: 'Profile saved.',
+    invalidJson: 'The file is not valid JSON.',
+    scanMatched: 'From the scan: {count} catalog apps are already on this PC — ticked.',
+    importedValues: 'Imported {count} values from {name}.',
+    thisPc: 'this PC',
+    oldPcPrograms: 'ℹ️ The old PC had {count} installed programs. The first ones: {list}… Pick the matching ones in the \u201cApps\u201d group.',
+    // ---------- modes / helper badge ----------
+    postModeConfirm: '\u201cPost-install\u201d mode: the same settings will be applied NOW on this PC (debloat, fixes, apps — via the admin helper). Switch the mode?',
+    postModeNeedsHelper: '⚠️ Running it requires the helper — start WinSetupStudio.cmd (as admin).',
+    badgeAutoAdmin: '🛡 AUTOMATIC (admin)',
+    badgeAutoNoAdmin: '⚡ AUTOMATIC (no admin)',
+    // ---------- search haystacks ----------
+    usersSearchHay: 'account accounts user users password passwords autologon logon admin',
+    appsSearchHay: '8. Apps apps winget programs install software',
+    // ---------- wizard (🧙 Stages) ----------
+    wizTitle: '🧙 Stages — from a flash drive to a ready PC',
+    wizStep1: '1. Flash drive + Windows',
+    wizStep2: '2. Configuration',
+    wizStep3: '3. Drivers',
+    wizStep4: '4. Apps',
+    wizBack: '← Back',
+    wizNext: 'Next →',
+    wizClose: 'Close',
+    wizCloseDone: '✓ Close',
+    wizNeedsAuto: '🧙 The wizard requires the automatic mode — start WinSetupStudio.cmd (it prompts UAC).',
+    wizNeedsAutoInline: 'The wizard requires automatic mode (WinSetupStudio.cmd).',
+    wizNoUsb: 'No USB flash drives attached — plug one in and press ↻.',
+    usbDriveFallback: 'USB drive',
+    wizStep1Intro: 'Step 1: plug in a flash drive → download Windows → put the ISO onto the flash drive.',
+    wizUsbH: '① Flash drive',
+    wizUsbRefresh: '↻ Refresh',
+    wizIsoH: '② Download Windows (official ISO)',
+    wizIsoDl: '⬇ Download (console, ~5-6 GB)',
+    wizIsoPathH: '③ Point to the ISO file',
+    wizIsoLatest: '↻ Latest ISO in Downloads',
+    wizUsbPrep: '🔧 Prepare the flash drive (format + copy the ISO)',
+    wizUsbPrepHint: 'The console asks for confirmation (type YES) — everything on the flash drive is erased! In step 2 we will upload autounattend.xml to the flash drive.',
+    wizPickUsbToast: 'Pick a flash drive from the list above.',
+    wizIsoPathToast: 'Enter the full path to the .iso file.',
+    wizPrepStarting: 'Starting the preparation — watch the PowerShell window (confirm with YES)…',
+    wizPrepStarted: 'Started — see the PowerShell window (confirm with YES).',
+    wizIsoDlStatus: 'The download started in the console (~5-6 GB).',
+    wizIsoLatestFound: 'Found: {path}',
+    wizIsoLatestNone: 'No .iso in Downloads.',
+    wizStep2Intro: 'Step 2: configuration (autounattend.xml).',
+    wizReadPc: '⚡ Read this PC (recommended)',
+    wizOpenSetup: '⚙️ Configure the main setup',
+    wizOpenSetupToast: 'Configure in the main view and come back to 🧙 Stages.',
+    wizSummaryH: 'Configuration summary',
+    wizSummaryVersion: 'Version: {v}',
+    wizSummaryEdition: 'Edition: {v}',
+    wizSummaryLang: 'Language: {v}',
+    wizSummaryAccounts: 'Accounts: {v}',
+    wizSummaryDisks: 'Partitions: {v}',
+    wizUpload: '🔧 Upload autounattend.xml to the flash drive ({target})',
+    wizUploadPickUsb: 'pick a flash drive in step 1',
+    wizUploadHint: 'Writes with UTF-8 BOM to the root of the flash drive — only to a removable disk (guard).',
+    wizPickFlashStep1: 'Pick a flash drive in step 1.',
+    wizUploadStarting: 'Uploading autounattend.xml to the flash drive…',
+    wizUploadErrors: 'There are errors in the configuration — see the Summary.',
+    wizUploadDone: 'Uploaded to the flash drive: {path}',
+    wizUploadFinalDone: '🎉 FINALLY uploaded (with the apps): {path}',
+    wizStep3Intro: 'Step 3: drivers — creates {letter}\\drivers and downloads the packages there.',
+    wizDrvMkdir: '📁 Create {letter}\\drivers',
+    wizDrvMkdirHint: 'creates the folder on the flash drive',
+    wizMkdirCreated: 'Created: {path}',
+    wizStep3Hint: 'Group 10 \u201cDrivers from the \\drivers folder\u201d installs everything from there at first logon. Known models are added on request.',
+    wizDrvDlStarting: 'Starting the package download — see the PowerShell window…',
+    wizDrvDlStarted: 'The download started.',
+    wizStep4Intro: 'Step 4: apps — a configuration script (winget) embedded in autounattend.xml.',
+    wizSelectedApps: 'Selected: {count} apps (the full catalog — in the main view)',
+    wizFinal: '🔧 Update autounattend.xml on the flash drive (final)',
+    wizFinalReady: '🎉 Ready to boot! Boot from the flash drive (UEFI) → the installation runs by itself → apps are installed at first logon. If Setup asks questions (ConX): Shift+F10 → setup.exe /Unattend:E:\\autounattend.xml. If it wants an MS account: start ms-cxh:localonly.',
+    // ---------- Read PC modal ----------
+    readPcTitle: "🖥 Read this PC's settings",
+    autoModeActive: '⚡ Automatic mode is active',
+    autoModeActiveAdmin: ' <b>(admin)</b>',
+    autoModeActiveNoAdmin: ' <b>(no admin — features/BitLocker/disks will be missing)</b>',
+    oneClick: 'ONE CLICK — no script downloads, no PowerShell, no moving files:',
+    readNow: '⚡ Read now',
+    readNowStarting: '⏳ Reading settings…',
+    helperRightsHint: 'The permissions come from the helper (started by WinSetupStudio.cmd with UAC). If you want the full data — restart via WinSetupStudio.cmd and accept the UAC prompt.',
+    manualVariant: 'The manual variant (the old way)',
+    manualProfileHint: 'Saves a profile on the Desktop: WinSetupStudio-profile.json — including installed programs and hardware.',
+    dlExportBtn: '⬇ Download Export-WinSettings.ps1',
+    dlExportDone: 'Downloaded Export-WinSettings.ps1 (to Downloads).',
+    openPsAndRun: 'Open PowerShell (Win+X → \u201cTerminal\u201d) and run:',
+    dragJsonOr: 'Drag the resulting JSON onto the app or',
+    pickFile: 'Choose a file…',
+    manualModeWarn: '⚠️ Manual mode: the app is opened directly as a file. For one-click automation, start WinSetupStudio.cmd (it asks for admin rights and launches the helper).',
+    close: 'Close',
+    // ---------- ISO modal ----------
+    isoTitle: '⬇ Download Windows (official ISO)',
+    isoDesc: "The link comes directly from Microsoft's servers (the same API as the download page) — an original ISO, nothing is modified.",
+    isoAutoActive: '⚡ Automatic mode is active.',
+    isoAutoBtn: '⚡ Download now (PowerShell window with progress)',
+    isoAutoHint: 'The ISO (~5–6 GB) goes to Downloads. Then use \u201c🔌 Flash drive\u201d with its path.',
+    isoManualWarn: '⚠️ Manual mode: for one-click automation, start WinSetupStudio.cmd.',
+    isoVersionLabel: 'Version',
+    isoLangLabel: 'Language',
+    isoManualVariant: 'The manual variant (download the script)',
+    isoManualHint: 'First: ⬇ Download Get-WindowsIso.ps1. With -ListLangs you see the languages, with -List only the link.',
+    isoFallback: 'Fallback (always works): microsoft.com/software-download/windows11 — Media Creation Tool or a manual ISO.',
+    isoStarting: '⏳ Starting the download…',
+    isoStarted: 'The download started — see the PowerShell window.',
+    // ---------- USB modal ----------
+    usbTitle: '🔌 Installation flash drive helper',
+    usbAutoActiveAdmin: '⚡ Automatic mode is active <b>(admin)</b>',
+    usbAutoActiveNoAdmin: '⚡ Automatic mode is active <b>(no admin — the script will require elevation)</b>',
+    usbIsoPathLabel: 'Path to the ISO file:',
+    usbStartBtn: '⚡ Prepare the flash drive now',
+    usbWhatIfBtn: 'WhatIf (plan only, nothing is deleted)',
+    usbHint: 'A PowerShell window will open — there you confirm with \u201cYES\u201d and choose the flash drive (or pass a letter). Nothing is deleted without that confirmation.',
+    usbWhatItDoes: '<b>What the script does:</b> wipes the flash drive → FAT32 → copies the ISO contents → splits install.wim if over 4GB (.swm — \u201cthe compression that used to break\u201d) → places <b>autounattend.xml</b> in the root → <b>copies WinSetup Studio itself</b> onto the flash drive.',
+    usbManualHint: 'AS ADMINISTRATOR. A flash drive up to 32GB (FAT32); for larger ones — Rufus with UEFI:NTFS.',
+    usbDlBtn: '⬇ Download Make-SetupUSB.ps1',
+    usbDlDone: 'Downloaded Make-SetupUSB.ps1 (to Downloads).',
+    usbEnterPath: 'Enter the path to the ISO file.',
+    usbFullPath: 'The path must be full, e.g. C:\\ISO\\Win11.iso',
+    usbStarted: 'Started — see the PowerShell window.',
+    usbStarting: '⏳ Starting…',
+    // ---------- Help modal ----------
+    helpTitle: '❓ How all of this works',
+    helpIdea: '<b>The idea:</b> <i>autounattend.xml</i> is the official Windows Setup \u201canswer file\u201d. When it sits in the <b>ROOT directory</b> of any boot device, Setup finds it by itself and answers the questions for you. The result is an installation you start and then leave alone.',
+    helpCycleH: 'Full cycle (everything is in the folder)',
+    helpCycle1: '⬇ <b>Download Windows</b> — Get-WindowsIso.ps1 fetches an official ISO (or the MCT page).',
+    helpCycle2: 'Configure everything here → <b>Generate autounattend.xml</b>.',
+    helpCycle3: '🔌 <b>Make-SetupUSB.ps1</b> — prepares the flash drive and feeds it the file + the tool itself.',
+    helpCycle4: 'Boot from the flash drive → the installation runs by itself → the apps are installed at first logon.',
+    helpVariantsH: 'Two variants of the program',
+    helpVariantWeb: '<b>Web:</b> WinSetupStudio.html — double-click it in Edge/Chrome (works OFFLINE from the flash drive too).',
+    helpVariantApp: '<b>App:</b> WinSetupStudio.cmd — the same thing in its own window without browser chrome (Edge --app mode).',
+    helpConxH: 'Windows 11 25H2/26H2 — important notes',
+    helpConx1: 'The \u201cConX\u201d mode <b>sometimes ignores</b> the answer file: <b>Shift+F10</b> → <code>setup.exe /Unattend:D:\\autounattend.xml</code>.',
+    helpConx2: 'MS account: the file creates a <b>local account directly</b> (UserAccounts + HideOnlineAccountScreens) — it works. Fallbacks: the aggressive network mode (group 3) or manually: <code>start ms-cxh:localonly</code>.',
+    helpConx3: 'The hardware bypasses (TPM/SecureBoot/RAM) work on 25H2/26H2 too.',
+    helpCompressionH: 'Why \u201cthe compression used to break\u201d',
+    helpCompression: 'FAT32 (required for UEFI boot) cannot hold files over <b>4GB</b>. The solution: <code>dism /Split-Image /ImageFile:install.wim /SWMFile:install.swm /FileSize:3800</code> — Setup reads the .swm files automatically. Make-SetupUSB.ps1 does it for you.',
+    helpKeysH: 'The keys',
+    helpKeys: 'Generic keys are public and serve only to <b>select the edition</b> — they do not activate Windows. Activation comes from the digital license/the real key after installation.',
+    helpSourcesH: 'Sources (checked 11.2026)',
+    helpSrc1: '<a href="https://schneegans.de/windows/unattend-generator/" target="_blank">schneegans.de Unattend Generator</a> — probably the \u201clost\u201d tool.',
+    helpSrc2: '<a href="https://github.com/memstechtips/UnattendedWinstall" target="_blank">UnattendedWinstall</a> — reference 25H2 files.',
+    helpSrc3: '<a href="https://github.com/pbatard/Fido" target="_blank">Fido (Pbatard)</a> — the method for official ISO links (used in Get-WindowsIso.ps1).',
+    helpSrc4: '<a href="https://learn.microsoft.com/en-us/windows-server/get-started/kms-client-activation-keys" target="_blank">Microsoft: KMS client keys</a>',
+    // ---------- Help tab ----------
+    htabQuickStartH: 'Quick start (the full cycle)',
+    htabQuickStart: '1. ⬇ Download Windows → 2. Configure → 3. <b>Generate</b> → 4. 🔌 Make-SetupUSB.ps1 (flash drive + file + tool) → 5. Boot and touch nothing. The apps from group 8 install themselves at first logon.',
+    htabColorsH: 'The colors',
+    htabColors: '🟢 green = safe for anyone · 🟠 orange = advanced, read the explanation · 🔴 red = dangerous/expert. Every setting has a \u201cWhat is this?\u201d. The <b>Basic/Detailed</b> switch is at the top.',
+    htabProfileH: 'Profile (export/import)',
+    htabProfile: '\u201c🖥 Read this PC\u201d → the script saves a JSON to the Desktop → drag it onto the app and adjust whatever you want. \u201c📤 Save profile\u201d stores your settings for the next time.',
+    htabConxH: '25H2/26H2 ConX note',
+    htabMsFallbackH: 'MS account fallback (OOBE)',
+    htabWimH: 'install.wim &gt; 4GB (FAT32)',
+    htabHint: 'Details: the \u201c❓ Help\u201d button at the top. Sources: schneegans.de · UnattendedWinstall · Fido · MS KMS keys · ElevenForum.',
+    // ---------- generated XML comment ----------
+    xmlCommentRoot: 'Put this file in the ROOT (top-level folder) of the installation flash drive.'
+  },
+  groups: {
+    localization: { title: '1. Localization', desc: 'Language, keyboard, time zone' },
+    edition:      { title: '2. Edition and key', desc: 'Edition and generic key' },
+    bypass:       { title: '3. Bypass restrictions', desc: 'Hardware checks and MS account' },
+    disk:         { title: '4. Partitions', desc: 'Where to install' },
+    users:        { title: '5. Users', desc: 'Accounts, passwords, autologon' },
+    oobe:         { title: '6. OOBE and privacy', desc: 'Screens after installation' },
+    features:     { title: '7. Features', desc: 'Hyper-V, WSL, .NET' },
+    apps:         { title: '8. Apps', desc: 'Auto-install at first logon (catalog + winget)' },
+    debloat:      { title: '9. Debloat and tweaks', desc: 'Apps and settings after logon' },
+    drivers:      { title: '10. Drivers and updates', desc: 'Drivers from the flash drive, Dynamic Update, per-model packages' },
+    network:      { title: '11. Network and domain', desc: 'Computer name, Workgroup/Domain' },
+    fixes:        { title: '12. Fixes', desc: 'Repairs for problem installations — optional' }
+  },
+  settings: {
+    /* ===== 1. Localization ===== */
+    targetversion: { label: 'Target Windows version',
+      opts: [['26H2','Windows 11 26H2 (latest)'],['25H2','Windows 11 25H2'],['24H2','Windows 11 24H2'],['23H2','Windows 11 23H2'],['22H2','Windows 11 22H2'],['win10','Windows 10 (22H2)']],
+      what: 'The version of the ISO you are going to install. Determines which bypasses are needed and which warnings are shown. The bypass facts have been verified and work as of 25H2/26H2.',
+      when: 'Match it to the version of the media — a new ISO from Microsoft is always the latest version.',
+      risk: 'If the version does not match the ISO, only the warnings become inaccurate — the file itself still works.' },
+    uilanguage: { label: 'Setup language (UI)',
+      opts: [['bg-BG','Bulgarian'],['en-US','English (US)'],['en-GB','English (UK)'],['de-DE','German'],['fr-FR','French'],['it-IT','Italian'],['es-ES','Spanish'],['pt-BR','Portuguese (BR)'],['nl-NL','Dutch'],['sv-SE','Swedish'],['pl-PL','Polish'],['hu-HU','Hungarian'],['cs-CZ','Czech'],['ro-RO','Romanian'],['el-GR','Greek'],['tr-TR','Turkish'],['ru-RU','Russian'],['uk-UA','Ukrainian'],['sr-Latn-RS','Serbian (Latin)'],['mk-MK','Macedonian'],['ja-JP','Japanese'],['ko-KR','Korean'],['zh-CN','Chinese (Simplified)']],
+      what: 'The language of the installer itself and of Windows afterwards (UILanguage). With \u201cBulgarian\u201d, the installer and the system are in Bulgarian.',
+      when: 'Always.',
+      risk: 'None. If the ISO has only one language, Windows will add the language pack after installation.' },
+    inputlocale: { label: 'Keyboard layouts',
+      what: 'A list of layouts in \u201ccode:layout\u201d form, separated by \u201c;\u201d. 0402:00000402 = Bulgarian (BDS); 0409:00000409 = US English.',
+      when: 'Always — for a BG machine keep the default (BG + EN).',
+      risk: 'None. Complex IME layouts (Japanese/Chinese) are set with long GUID formats.' },
+    userlocale: { label: 'Formats (UserLocale)',
+      what: 'The format for dates, time, currency and numbers (e.g. bg-BG → 17.11.2026, lev).',
+      when: 'If you want Bulgarian formats with an English interface.',
+      risk: 'None.' },
+    systemlocale: { label: 'SystemLocale (non-Unicode)',
+      what: 'The language for programs that do not support Unicode (a \u201clegacy\u201d code page). bg-BG = Cyrillic displays correctly in old programs.',
+      when: 'If you use old programs with Cyrillic.',
+      risk: 'Changing it AFTER installation requires a restart; set here, it is applied perfectly.' },
+    timezone: { label: 'Time zone',
+      opts: [['FLE Standard Time','(UTC+02:00) Sofia / Eastern Europe — FLE Standard Time'],['Central Europe Standard Time','(UTC+01:00) Belgrade, Bratislava, Budapest, Ljubljana, Prague — Central Europe Standard Time'],['Central European Standard Time','(UTC+01:00) Sarajevo, Skopje, Warsaw, Zagreb — Central European Standard Time'],['W. Europe Standard Time','(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna — W. Europe Standard Time'],['Romance Standard Time','(UTC+01:00) Brussels, Copenhagen, Madrid, Paris — Romance Standard Time'],['GTB Standard Time','(UTC+02:00) Athens, Bucharest, Istanbul — GTB Standard Time'],['E. Europe Standard Time','(UTC+02:00) Chișinău, Kyiv — E. Europe Standard Time'],['Turkish Standard Time','(UTC+03:00) Istanbul — Turkish Standard Time'],['Russian Standard Time','(UTC+03:00) Moscow, St. Petersburg, Volgograd — Russian Standard Time'],['GMT Standard Time','(UTC+00:00) Dublin, Edinburgh, Lisbon, London — GMT Standard Time'],['UTC','(UTC+00:00) Coordinated Universal Time — UTC'],['Azores Standard Time','(UTC-01:00) Azores — Azores Standard Time'],['Arabian Standard Time','(UTC+04:00) Abu Dhabi, Muscat — Arabian Standard Time'],['India Standard Time','(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi — India Standard Time'],['China Standard Time','(UTC+08:00) Beijing, Chongqing, Hong Kong SAR — China Standard Time'],['Korea Standard Time','(UTC+09:00) Seoul — Korea Standard Time'],['Tokyo Standard Time','(UTC+09:00) Osaka, Sapporo, Tokyo — Tokyo Standard Time'],['AUS Eastern Standard Time','(UTC+10:00) Canberra, Melbourne, Sydney — AUS Eastern Standard Time'],['US Eastern Standard Time','(UTC-05:00) Eastern Time (US & Canada) — US Eastern Standard Time'],['US Pacific Standard Time','(UTC-08:00) Pacific Time (US & Canada) — US Pacific Standard Time']],
+      what: 'The time zone after installation. \u201cFLE Standard Time\u201d = Bulgaria (Eastern European Time with daylight saving).',
+      when: 'Always. Without it Windows guesses from the location — but that requires internet.',
+      risk: 'None. Full list: Get-TimeZone -ListAvailable.' },
+    /* ===== 2. Edition and key ===== */
+    edition: { label: 'Edition',
+      opts: [['auto','No key — auto-select (BIOS license / the ISO edition)'],['Home','Windows 11/10 Home'],['HomeN','Windows 11/10 Home N'],['HomeSL','Windows 11 Home Single Language'],['Pro','Windows 11/10 Pro (most common)'],['ProN','Windows 11/10 Pro N'],['ProWS','Windows 11/10 Pro for Workstations'],['Education','Windows 11/10 Education'],['Enterprise','Windows 11/10 Enterprise'],['LTSC2024','Windows 11 Enterprise LTSC 2024'],['IoTLTSC2024','Windows IoT Enterprise LTSC 2024']],
+      what: 'Which edition to install. The key below is filled in automatically with the so-called generic key — it SELECTS the edition but does NOT activate Windows.',
+      when: 'Pro for normal use (full features). Enterprise/LTSC — for corporate/long-term servicing.',
+      risk: 'If your activation is a digital license for a specific edition, install the SAME edition — it will activate automatically online. LTSC keys (GVLK) stay unactivated without a KMS server.' },
+    productkey: { label: 'Product key (generic)',
+      what: 'The key Setup uses to pick the edition. Generic keys are public and legal for installation. Activation happens afterwards.',
+      when: 'Empty (edition \u201cNo key\u201d) = Setup decides by itself using the built-in BIOS license.',
+      risk: 'None. Do NOT put your real retail key here on machines you will reinstall often — use a generic key.' },
+    fullname: { label: 'Name (registration, optional)',
+      what: 'The FullName value in the system (visible in the system properties).',
+      when: 'When the machine is for an organization/client.',
+      risk: 'None.' },
+    organization: { label: 'Organization (optional)',
+      what: 'The Organization value in the system properties.',
+      when: 'Corporate images.',
+      risk: 'None.' },
+    /* ===== 3. Bypass ===== */
+    bypasshw: { label: 'Bypass the hardware checks (TPM / Secure Boot / RAM / CPU)',
+      what: 'Adds registry commands during Setup (HKLM\\SYSTEM\\Setup\\LabConfig): BypassTPMCheck, BypassSecureBootCheck, BypassRAMCheck, BypassCPUCheck, BypassStorageCheck, BypassDiskCheck. This lets Windows 11 install on PCs without TPM 2.0 / Secure Boot / 4GB+ RAM. Verified as working on 25H2 too.',
+      when: 'Old/officially unsupported machines, test VMs without TPM.',
+      risk: '🟠 Officially unsupported configuration — Microsoft does not promise updates for such machines. In practice they work normally.' },
+    bTpm: { label: 'Bypass only: TPM check',
+      what: 'BypassTPMCheck only.',
+      when: 'Hardware that passes all the other requirements.',
+      risk: 'Officially unsupported.' },
+    bSb: { label: 'Bypass only: Secure Boot',
+      what: 'BypassSecureBootCheck only.',
+      when: 'Old UEFI without Secure Boot.',
+      risk: 'Officially unsupported.' },
+    bRam: { label: 'Bypass only: RAM (min. 4GB)',
+      what: 'BypassRAMCheck only.',
+      when: 'Old/weak machines or small VMs.',
+      risk: 'The system will run, but slowly.' },
+    bCpu: { label: 'Bypass only: CPU list',
+      what: 'BypassCPUCheck only (the processor is not on the approved list).',
+      when: 'Old CPU on a new motherboard.',
+      risk: 'Officially unsupported.' },
+    bStor: { label: 'Bypass only: Storage',
+      what: 'BypassStorageCheck only.',
+      when: 'Small/slow drives.',
+      risk: 'Windows needs ~64GB for normal operation.' },
+    bDisk: { label: 'Bypass only: Disk (IOPS)',
+      what: 'BypassDiskCheck only.',
+      when: 'SD card/slow USB drive.',
+      risk: 'Not recommended as a system disk.' },
+    bypassBitLocker: { label: 'Bypass the BitLocker check (24H2+)',
+      what: 'LabConfig BypassBitLockerCheck. Since 24H2, Setup checks whether the device can encrypt automatically (device encryption) and sometimes stops the installation.',
+      when: 'Machines without TPM or with unusual disk configurations.',
+      risk: 'No automatic encryption of new installations — on personal machines that is exactly what most people want.' },
+    bypassUpgrade: { label: 'Allow upgrades on unsupported hardware',
+      what: 'HKLM\\SYSTEM\\Setup\\MoSetup → AllowUpgradesWithUnsupportedTPMOrCPU=1. Allows installation FROM WITHIN an existing Windows on a machine that only partially meets the requirements.',
+      when: 'An upgrade \u201con top of\u201d an already working (bypassed) system.',
+      risk: 'None for a clean install from a flash drive.' },
+    bypassNRO: { label: 'BypassNRO key (older builds only)',
+      what: 'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\OOBE → BypassNRO=1. Removes the internet/MS account requirement in OOBE. Since 2025 Microsoft removed the script and the key no longer works on new builds — that is why the primary mechanism is a local account defined in the file (group 5).',
+      when: 'Windows 10 or old Windows 11 builds.',
+      risk: 'None on new versions — it simply has no effect.' },
+    networkOOBE: { label: '🔴 Aggressive: disable the network during OOBE',
+      what: 'During the specialize phase all network adapters are DISABLED (Disable-NetAdapter) and re-enabled at first logon. Without internet, OOBE physically cannot demand an MS account — a 100% working path to a local account on stubborn builds.',
+      when: 'When, despite the settings in groups 5–6, the machine still asks for an MS account.',
+      risk: '🔴 No internet until first logon. The tweaks script re-enables the adapters at first logon.' },
+    /* ===== 4. Partitions ===== */
+    diskmode: { label: 'Where to install',
+      opts: [['manual','Manual: Setup will ask for a partition (safe)'],['auto-uefi','Automatic on empty disk 0 — UEFI/GPT (WIPES disk 0!)'],['auto-bios','Automatic on empty disk 0 — BIOS/MBR (WIPES disk 0!)'],['avail','To the first suitable partition (InstallToAvailablePartition)']],
+      what: 'manual = the safest: the installation is automatic UP TO the partition choice. auto-uefi = Setup wipes and creates the partitions itself (EFI + MSR + Windows) on disk 0. avail = no partition definition — Setup uses the first partition with enough space.',
+      when: 'The auto modes are for new machines/VMs, when you want 100% hands-off.',
+      risk: '🔴 The auto modes WIPE THE ENTIRE disk 0 without asking! avail may reformat an existing partition. (A separate Recovery partition is not created here — WinRE lives in C:\\Recovery and works fully.)' },
+    efisize: { label: 'EFI partition size (MB)',
+      opts: [['100','100 MB'],['300','300 MB (recommended)'],['500','500 MB']],
+      what: 'EFI System Partition — boots Windows (the bootloader). 300 MB leaves room for future firmware/boot updates.',
+      when: '100 MB is enough, but Microsoft recommends 300 for Win11.',
+      risk: 'Less than 100 MB may block future updates.' },
+    wipeconfirm: { label: '🔴 I confirm: wipe EVERYTHING on disk 0',
+      what: 'An explicit confirmation that you understand the wiping. Without it the generator refuses to create the file with an auto mode.',
+      when: 'A new disk / VM / a machine being reinstalled.',
+      risk: '🔴 The data CANNOT be recovered.' },
+    diskid: { label: 'DiskID (disk number)',
+      what: 'Which physical disk (0 = the first). Only for multi-disk machines.',
+      when: 'When you want the installation on a second disk.',
+      risk: '🔴 A wrong number = the wrong disk gets wiped.' },
+    /* ===== 5. Users ===== */
+    autologon: { label: 'Automatic logon after installation',
+      what: 'AutoLogon: the system signs in by itself with the FIRST administrator once after installation — needed so the tweaks and apps can run.',
+      when: 'Always when tweaks/apps are used. Turn it off if someone else will use the machine right away.',
+      risk: 'None — the logon happens only once (LogonCount=1).' },
+    plaintext: { label: '🔴 Store the passwords as plain text',
+      what: 'Instead of base64 (the Microsoft standard for answer files), the passwords are stored readable in the XML. IMPORTANT: base64 is NOT encryption — it decodes instantly. In BOTH variants the XML can be read by anyone the file reaches.',
+      when: 'For tests/debugging only.',
+      risk: '🔴 Whoever sees the file sees the passwords. Profiles (JSON) and the browser auto-save also keep them in plain form — do not share profiles with real passwords.' },
+    /* ===== 6. OOBE and privacy ===== */
+    hideeula: { label: 'Hide the EULA page',
+      what: 'HideEULAPage=true — accepts the license automatically (AcceptEula is set in group 2).',
+      when: 'Always.',
+      risk: 'None.' },
+    hideoem: { label: 'Hide the OEM registration screen',
+      what: 'HideOEMRegistrationScreen=true — removes the \u201cRegister this device with the OEM\u201d page.',
+      when: 'Always.',
+      risk: 'None.' },
+    hideonline: { label: 'Hide the Microsoft account screens',
+      what: 'HideOnlineAccountScreens=true — a critical field: OOBE offers no MS account and proceeds to the local one created in group 5.',
+      when: 'Always with a local account.',
+      risk: 'None. On the newest builds, if you still see an MS screen — also enable the aggressive network mode (group 3).' },
+    hidewireless: { label: 'Hide the Wi-Fi setup in OOBE',
+      what: 'HideWirelessSetupInOOBE=true — does not ask for Wi-Fi during OOBE.',
+      when: 'Desktop PCs with a cable; VMs.',
+      risk: 'If the machine is Wi-Fi only — you connect manually afterwards.' },
+    protectpc: { label: 'ProtectYourPC (privacy preset)',
+      opts: [['3','Minimum: no automatic \u201crecommended\u201d settings'],['1','Express: MS recommended settings (diagnostics, ads...)']],
+      what: '3 = OOBE skips the \u201cExpress settings\u201d and uses conservative values. 1 = everything \u201crecommended\u201d by Microsoft.',
+      when: '3 for personal machines.',
+      risk: 'None — just an initial preset.' },
+    /* ===== 7. Features ===== */
+    f_netfx35: { label: '.NET Framework 3.5',
+      what: 'Installs NetFx3 (the old .NET platform many old programs need). The script first tries via Windows Update, then scans the media for sources\\sxs.',
+      when: 'Old business/industrial programs, old games.',
+      risk: '🟠 Requires internet OR the original flash drive at first logon.' },
+    f_hyperv: { label: 'Hyper-V',
+      what: 'Enable-WindowsOptionalFeature Microsoft-Hyper-V-All — Windows virtualization (Pro/Enterprise/Education; missing in Home).',
+      when: 'Virtual machines, the WSL2 backend, Windows Sandbox.',
+      risk: '🟠 Enables the hypervisor — some game anti-cheat systems behave differently.' },
+    f_wsl: { label: 'WSL 2 (Subsystem for Linux)',
+      what: 'Enables Microsoft-Windows-Subsystem-Linux + VirtualMachinePlatform. The distro is installed afterwards with \u201cwsl --install -d Ubuntu\u201d.',
+      when: 'Development, Linux tools.',
+      risk: '🟠 Requires virtualization enabled in the BIOS.' },
+    f_sandbox: { label: 'Windows Sandbox',
+      what: 'Containers-DisposableClientVM — a one-off, clean virtual environment for trying out suspicious files (Pro+).',
+      when: 'Testing installers.',
+      risk: '🟠 Requires virtualization.' },
+    /* ===== 9. Debloat and tweaks ===== */
+    appsPreset: { label: 'Preinstalled apps (debloat preset)',
+      opts: [['none','Remove nothing'],['light','Light: Copilot, Teams/Chat, News, Solitaire, Clipchamp, Outlook(new)'],['standard','Standard: + Xbox, Zune(Music/TV), Maps, Phone Link, Sticky Notes, Todos, People...'],['aggressive','🔴 Aggressive: only Store, Calculator, Photos, Notepad, Terminal, Security remain']],
+      what: 'Removes the preinstalled (\u201cinbox\u201d) apps from all users AND from the image for future profiles (provisioned). Packages are targeted by name — it does not touch system components.',
+      when: 'A clean start on a new machine.',
+      risk: '🟠 Removing the Xbox Gaming Overlay can show a message in games. The aggressive preset can break Store-dependent features.' },
+    rm_onedrive: { label: 'Remove OneDrive',
+      what: 'Stops the process and runs the official uninstallers (System32/SysWOW64 OneDriveSetup.exe /uninstall).',
+      when: 'If you do NOT use OneDrive at all.',
+      risk: '🟠 If you sync documents with OneDrive — do NOT remove it!' },
+    t_telemetry: { label: 'Disable telemetry and DiagTrack',
+      what: 'The AllowTelemetry=0 policy + stops/disables the DiagTrack and dmwappushservice services; disables the Advertising ID.',
+      when: 'Personal machines.',
+      risk: '🟠 On Home the policy does not fully apply (Microsoft restricts policies in Home).' },
+    t_bing: { label: 'No Bing/web in Start search',
+      what: 'BingSearchEnabled=0 + DisableSearchBoxSuggestions=1 — search looks ONLY locally.',
+      when: 'Speed + privacy.',
+      risk: 'None.' },
+    t_contextmenu: { label: 'Classic context menu (Win11)',
+      what: 'The CLSID {86ca1aa0-...} InprocServer32 override — restores the full right-click menu (no \u201cShow more options\u201d). Explorer restarts after the tweaks.',
+      when: 'A matter of taste.',
+      risk: 'None; on future versions MS may remove it — then the key simply has no effect.' },
+    t_explorer: { label: 'Explorer: extensions + hidden files + This PC',
+      what: 'HideFileExt=0 (you see .txt/.exe), Hidden=1 (hidden files), LaunchTo=1 (Explorer opens \u201cThis PC\u201d).',
+      when: 'For technically minded users.',
+      risk: 'None.' },
+    t_taskbar: { label: 'No Widgets / Chat / Copilot / Task View on the taskbar',
+      what: 'TaskbarDa=0, TaskbarMn=0, ShowCopilotButton=0, ShowTaskViewButton=0 + the TurnOffWindowsCopilot policy.',
+      when: 'A clean taskbar.',
+      risk: 'None.' },
+    t_taskbarleft: { label: 'Taskbar icons LEFT-aligned (classic look)',
+      what: 'TaskbarAl=0 — the icons align to the left as in Windows 10 (the default is centered).',
+      when: 'Fans of the old look.',
+      risk: 'None.' },
+    t_clocksec: { label: 'Seconds in the clock',
+      what: 'ShowSecondsInSystemClock=1 — the taskbar clock also shows seconds.',
+      when: 'For people who watch the exact time.',
+      risk: 'None.' },
+    t_gamebar: { label: 'Disable Game Bar / Game DVR',
+      what: 'GameDVR_Enabled=0, AllowGameDVR=0, AppCaptureEnabled=0 — no clip recording on Win+G and no background recording.',
+      when: 'Gaming machines without a need for recording; a bit of freed RAM.',
+      risk: 'None — recording can be turned back on manually later.' },
+    t_stickykeys: { label: 'No Sticky Keys popup',
+      what: 'Accessibility\\StickyKeys Flags=506 — pressing Shift 5 times no longer pops up a dialog.',
+      when: 'Gamers (Shift spamming in games).',
+      risk: 'None.' },
+    t_ads: { label: 'No tips, suggestions or \u201csilent installs\u201d of apps',
+      what: 'ContentDeliveryManager: SystemPaneSuggestionsEnabled=0, SilentInstalledAppsEnabled=0 and the remaining SubscribedContent keys = 0.',
+      when: 'For a clean machine.',
+      risk: 'None.' },
+    t_tailored: { label: 'No \u201ctailored experiences\u201d from diagnostic data',
+      what: 'TailoredExperiencesWithDiagnosticDataEnabled=0 — MS does not use your diagnostic data for personalized tips/ads.',
+      when: 'Privacy.',
+      risk: 'None.' },
+    t_activity: { label: 'Disable Activity History (Timeline)',
+      what: 'EnableActivityFeed=0, PublishUserActivities=0, UploadUserActivities=0 — Windows no longer collects and uploads what you opened.',
+      when: 'Privacy.',
+      risk: 'The \u201cContinue from where I left off\u201d feature across devices stops working.' },
+    t_cortana: { label: 'Disable Cortana',
+      what: 'AllowCortana=0 (policy) — the assistant is disabled system-wide.',
+      when: 'For those who do not use it.',
+      risk: 'None.' },
+    t_nolockscreen: { label: 'No lock screen (straight to the sign-in screen)',
+      what: 'NoLockScreen=1 — on lock/sleep it goes straight to the sign-in screen without the picture in between.',
+      when: 'For those who hate extra screens.',
+      risk: '🟠 On Home it may not apply; on shared machines you also lose the lock-screen protection messages.' },
+    t_hiberboot: { label: 'No Fast Startup',
+      what: 'HiberbootEnabled=0 — \u201cshut down\u201d performs a TRUE shutdown (Fast Startup is semi-hibernation and often breaks dual boot/network drives).',
+      when: 'Dual boot systems, NAS users.',
+      risk: 'Startup becomes slightly slower.' },
+    t_hibernate: { label: 'Disable hibernation (free hiberfil.sys)',
+      what: 'powercfg /hibernate off — deletes hiberfil.sys (up to 40% of the RAM size) and also disables Fast Startup.',
+      when: 'Small SSDs.',
+      risk: 'Loss of the \u201cHibernate\u201d feature.' },
+    t_powerplan: { label: 'Power plan: High Performance',
+      what: 'powercfg /setactive 8c5e7fda-... — the CPU no longer sleeps aggressively.',
+      when: 'Desktop PCs.',
+      risk: '🟠 On a laptop: shorter battery life.' },
+    t_wudefer: { label: 'Defer feature updates (Pro+, days)',
+      opts: [['0','No deferral'],['7','7 days'],['14','14 days'],['30','30 days']],
+      what: 'WindowsUpdate policies: DeferFeatureUpdatesPeriodInDays + DeferQualityUpdatesPeriodInDays — new big versions are not installed immediately (feature updates are deferred up to N days; quality updates — a fixed 7 when selected).',
+      when: 'Stable work machines that do not want an upgrade right away.',
+      risk: '🟠 The policies work on Pro+; for 30+ days and stricter control a different mechanism is needed.' },
+    /* ===== 10. Drivers and updates ===== */
+    drv_usb: { label: 'Drivers from the \\drivers folder on the flash drive',
+      what: 'At first logon the script scans all removable/CD devices and for every \\drivers folder runs pnputil /add-driver ... /subdirs /install.',
+      when: 'Machines whose network card has no built-in driver in Win11 — put the .inf drivers there.',
+      risk: '🟠 Install only drivers from a trusted source.' },
+    dynupdate: { label: 'Dynamic Update during Setup',
+      what: 'OSImage → DynamicUpdate Enable=true: Setup downloads the latest cumulative updates and drivers from Microsoft DURING the installation.',
+      when: 'When the ISO is old and you do not want a day of updates after installation.',
+      risk: '🟠 The installation is no longer purely offline.' },
+    wustart: { label: 'Check for updates at first logon',
+      what: 'Starts a Windows Update scan right after the first logon.',
+      when: 'Always useful.',
+      risk: 'None.' },
+    appsupgrade: { label: 'Upgrade already installed apps (winget upgrade --all)',
+      what: 'Besides installing the selected apps, it also runs winget upgrade --all: updates ALL already installed winget-managed programs to the latest version.',
+      when: 'For machines already in use (not a clean install).',
+      risk: '🟠 Also updates programs you did not explicitly pick — use carefully on critical machines.' },
+    /* ===== 12. Fixes ===== */
+    fx_wurepair: { label: 'Windows Update repair',
+      what: 'Stops the wuauserv/bits/cryptsvc services, renames SoftwareDistribution and catroot2 (resets the Update cache), starts the services again and calls usoclient StartScan. For machines where Update is stuck.',
+      when: 'A \u201crepair\u201d installation or an image for machines with broken Update.',
+      risk: '🟠 Deletes the cache of downloaded updates (they download again). Not needed on a clean install.' },
+    fx_winsock: { label: 'Reset the network stack (winsock/IP)',
+      what: 'netsh winsock reset + netsh int ip reset + ipconfig /flushdns — for broken internet, strange DNS problems or VPN software leftovers.',
+      when: 'Repair images.',
+      risk: '🟠 Requires a restart; the network settings (static IPs!) are lost.' },
+    fx_sfc: { label: 'SFC /scannow at first logon',
+      what: 'sfc /scannow — checks and repairs the system files. Long (5–20 minutes).',
+      when: 'Repair images.',
+      risk: 'None — only reads/repairs system files.' },
+    /* ===== 11. Network and domain ===== */
+    computername: { label: 'Computer name',
+      what: 'ComputerName (specialize). Up to 15 characters, Latin letters/digits/hyphens (e.g. DESK-NIKI). Empty = Windows generates a random one.',
+      when: 'For recognition on the network / RDP.',
+      risk: 'A duplicate name on a local network = confusing RDP/SMB errors.' },
+    joinmode: { label: 'Join mode',
+      opts: [['workgroup','Workgroup (a home/office network without a server)'],['domain','Domain (an AD domain — corporate environment)']],
+      what: 'workgroup = an ordinary network (JoinWorkgroup). domain = joining an Active Directory domain — then fill in the fields below (UnattendedJoin with a domain account).',
+      when: 'For corporate machines with an IT department.',
+      risk: '🟠 Wrong domain data = the installation may hang in specialize; for domains always coordinate with IT.' },
+    domainname: { label: 'Domain name',
+      what: 'E.g. corp.contoso.com. Setup joins it during specialize.',
+      when: 'Corporate machines.',
+      risk: '🔴 The field is sensitive — a mistake hangs specialize; test before mass deployment.' },
+    domainuser: { label: 'Domain account (DOMAIN\\user or user@domain)',
+      what: 'An account with the right to add machines to the domain.',
+      when: 'Coordinated with IT.',
+      risk: 'It is written into the XML — use a temporarily created account.' },
+    domainpass: { label: 'Domain account password',
+      what: 'The password for the join.',
+      when: '—',
+      risk: 'It is written into the XML (base64). Change the password after deployment.' },
+    domainou: { label: 'OU path (optional)',
+      what: 'MachineObjectOU, e.g. OU=Workstations,DC=corp,DC=contoso,DC=com.',
+      when: 'When IT wants the machine in a specific OU.',
+      risk: 'None, if valid.' },
+    networklocation: { label: 'NetworkLocation (Home/Work/Public)',
+      opts: [['','(skip)'],['Home','Home'],['Work','Work'],['Public','Public']],
+      what: 'The NLA category of the network at first connection. Often ignored on modern Win11 builds — kept for compatibility.',
+      when: '—',
+      risk: 'None.' },
+    /* ===== extra rendered field (group 8) ===== */
+    wingetapps: { label: 'Additional winget IDs (comma-separated)',
+      what: 'Appended to the ticked list — at first logon the script runs winget install --id <ID> for each one (silently, accepting licenses).',
+      when: 'A program that is not in the catalog. Find its ID with the command \u201cwinget search name\u201d.',
+      risk: '🟠 Internet is required at first logon. Wrong IDs are simply skipped and logged.' }
+  },
+  apps: {
+    cats: {
+      '🌐 Браузъри': '🌐 Browsers',
+      '📦 Файлове и архиви': '📦 Files & archiving',
+      '🎬 Медия': '🎬 Media',
+      '📄 Документи': '📄 Documents',
+      '🛠 Разработка': '🛠 Development',
+      '🌐 Мрежови инструменти': '🌐 Network tools',
+      '🖥 Комфорт': '🖥 Comfort',
+      '🎮 Игри и медиа': '🎮 Games & media'
+    },
+    items: {
+      'Google.Chrome': { n: 'Google Chrome', h: 'the most widespread browser' },
+      'Mozilla.Firefox': { n: 'Mozilla Firefox', h: 'independent, privacy-oriented' },
+      'Brave.Brave': { n: 'Brave', h: 'with a built-in ad blocker' },
+      'Vivaldi.Vivaldi': { n: 'Vivaldi', h: 'for users who like to tweak everything' },
+      '7zip.7zip': { n: '7-Zip', h: 'archiver — a must-have' },
+      'voidtools.Everything': { n: 'Everything', h: 'instant file search across the whole disk' },
+      'AntibodySoftware.WizTree': { n: 'WizTree', h: 'what is taking up disk space' },
+      'Rufus.Rufus': { n: 'Rufus', h: 'write an ISO to a flash drive' },
+      'VideoLAN.VLC': { n: 'VLC', h: 'plays everything' },
+      'IrfanView.IrfanView': { n: 'IrfanView', h: 'lightweight image viewer' },
+      'foobar2000.foobar2000': { n: 'foobar2000', h: 'minimalist music player' },
+      'Audacity.Audacity': { n: 'Audacity', h: 'audio editor' },
+      'OBSProject.OBSStudio': { n: 'OBS Studio', h: 'screen recording and streaming' },
+      'Notepad++.Notepad++': { n: 'Notepad++', h: 'text editor — very useful' },
+      'LibreOffice.LibreOffice': { n: 'LibreOffice', h: 'free Word/Excel alternative' },
+      'SumatraPDF.SumatraPDF': { n: 'SumatraPDF', h: 'fast PDF reader' },
+      'Adobe.Acrobat.Reader.64-bit': { n: 'Adobe Acrobat Reader', h: 'the standard PDF reader' },
+      'KDE.Krita': { n: 'Krita', h: 'drawing and digital art' },
+      'Microsoft.PowerShell': { n: 'PowerShell 7', h: 'the modern PowerShell (pwsh)' },
+      'Microsoft.VisualStudioCode': { n: 'VS Code', h: 'code and text editor' },
+      'Git.Git': { n: 'Git', h: 'version control for code' },
+      'Python.Python.3.12': { n: 'Python 3.12', h: 'scripting language' },
+      'OpenJS.NodeJS.LTS': { n: 'Node.js LTS', h: 'JavaScript runtime' },
+      'Docker.DockerDesktop': { n: 'Docker Desktop', h: 'containers (Pro+, requires WSL2)' },
+      'Postman.Postman': { n: 'Postman', h: 'API testing' },
+      'WiresharkFoundation.Wireshark': { n: 'Wireshark', h: 'network traffic analysis' },
+      'PuTTY.PuTTY': { n: 'PuTTY', h: 'SSH/Telnet client' },
+      'WinSCP.WinSCP': { n: 'WinSCP', h: 'SFTP/SCP file transfer' },
+      'Insecure.Nmap': { n: 'Nmap', h: 'port and network scanning' },
+      'famatech.AdvancedIPScanner': { n: 'Advanced IP Scanner', h: 'local network scanning' },
+      'qBittorrent.qBittorrent': { n: 'qBittorrent', h: 'ad-free torrent client' },
+      'FileZilla.FileZilla': { n: 'FileZilla', h: 'FTP client' },
+      'ShareX.ShareX': { n: 'ShareX', h: 'screenshots and recording — super powerful' },
+      'Microsoft.PowerToys': { n: 'PowerToys', h: 'official Microsoft utilities' },
+      'Discord.Discord': { n: 'Discord', h: 'voice chats' },
+      'TelegramMessenger.TelegramDesktop': { n: 'Telegram', h: 'messenger' },
+      'Zoom.Zoom': { n: 'Zoom', h: 'video meetings' },
+      'SlackTechnologies.Slack': { n: 'Slack', h: 'office chat' },
+      'Notion.Notion': { n: 'Notion', h: 'notes and wiki' },
+      'TeamViewer.TeamViewer': { n: 'TeamViewer', h: 'remote assistance' },
+      'AnyDesk.AnyDesk': { n: 'AnyDesk', h: 'remote assistance, lightweight' },
+      'Valve.Steam': { n: 'Steam', h: 'gaming platform' },
+      'Spotify.Spotify': { n: 'Spotify', h: 'music' }
+    }
+  },
+  roles: {
+    home:     { n: 'Home', d: 'Browser, VLC, 7-Zip, Acrobat + light debloat, no Bing/ads. For a personal machine.' },
+    office:   { n: 'Office/Work', d: 'LibreOffice, Acrobat, Zoom/Slack/Notion + deferred feature updates (14 days). No aggressive debloat.' },
+    sysadmin: { n: 'Sysadmin', d: 'Hyper-V, WSL2, PS7, Git, VS Code, Everything, ShareX + telemetry off.' },
+    net:      { n: 'Network engineer', d: 'Wireshark, PuTTY, WinSCP, Nmap, Advanced IP Scanner, FileZilla, PS7 + WSL2.' },
+    dev:      { n: 'Developer', d: 'VS Code, Git, Python, Node, Docker, WSL2, Sandbox, Postman + minimal restrictions.' }
+  },
+  tz: {
+    'FLE Standard Time': '(UTC+02:00) Sofia / Eastern Europe — FLE Standard Time',
+    'Central Europe Standard Time': '(UTC+01:00) Belgrade, Bratislava, Budapest, Ljubljana, Prague — Central Europe Standard Time',
+    'Central European Standard Time': '(UTC+01:00) Sarajevo, Skopje, Warsaw, Zagreb — Central European Standard Time',
+    'W. Europe Standard Time': '(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna — W. Europe Standard Time',
+    'Romance Standard Time': '(UTC+01:00) Brussels, Copenhagen, Madrid, Paris — Romance Standard Time',
+    'GTB Standard Time': '(UTC+02:00) Athens, Bucharest, Istanbul — GTB Standard Time',
+    'E. Europe Standard Time': '(UTC+02:00) Chișinău, Kyiv — E. Europe Standard Time',
+    'Turkish Standard Time': '(UTC+03:00) Istanbul — Turkish Standard Time',
+    'Russian Standard Time': '(UTC+03:00) Moscow, St. Petersburg, Volgograd — Russian Standard Time',
+    'GMT Standard Time': '(UTC+00:00) Dublin, Edinburgh, Lisbon, London — GMT Standard Time',
+    'UTC': '(UTC+00:00) Coordinated Universal Time — UTC',
+    'Azores Standard Time': '(UTC-01:00) Azores — Azores Standard Time',
+    'Arabian Standard Time': '(UTC+04:00) Abu Dhabi, Muscat — Arabian Standard Time',
+    'India Standard Time': '(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi — India Standard Time',
+    'China Standard Time': '(UTC+08:00) Beijing, Chongqing, Hong Kong SAR — China Standard Time',
+    'Korea Standard Time': '(UTC+09:00) Seoul — Korea Standard Time',
+    'Tokyo Standard Time': '(UTC+09:00) Osaka, Sapporo, Tokyo — Tokyo Standard Time',
+    'AUS Eastern Standard Time': '(UTC+10:00) Canberra, Melbourne, Sydney — AUS Eastern Standard Time',
+    'US Eastern Standard Time': '(UTC-05:00) Eastern Time (US & Canada) — US Eastern Standard Time',
+    'US Pacific Standard Time': '(UTC-08:00) Pacific Time (US & Canada) — US Pacific Standard Time'
+  }
+};
+</script>
+<script>
 "use strict";
 /* ================================================================
    WinSetup Studio v2 — каталог, генератор и UI.
@@ -947,6 +1679,33 @@ const LOCALES={
   'pl-PL':'0415:00000415','hu-HU':'040e:0000040e','cs-CZ':'0405:00000405','uk-UA':'0422:00000422','sr-Latn-RS':'081a:0000081a','mk-MK':'042f:0000042f',
   'nl-NL':'0413:00000413','sv-SE':'041d:0000041d','ja-JP':'0411:00000411','ko-KR':'0412:00000412','zh-CN':'0804:00000804','pt-BR':'0416:00000416'
 };
+/* Часови зони — разбираеми етикети (стойността остава Windows ID) */
+const TZ_BG={
+ 'FLE Standard Time':'(UTC+02:00) София / Източна Европа',
+ 'Central Europe Standard Time':'(UTC+01:00) Прага / Будапеща / Варшава',
+ 'Central European Standard Time':'(UTC+01:00) Белград / Братислава / Любляна',
+ 'W. Europe Standard Time':'(UTC+01:00) Амстердам / Берлин / Рим / Виена',
+ 'Romance Standard Time':'(UTC+01:00) Брюксел / Копенхаген / Мадрид / Париж',
+ 'GTB Standard Time':'(UTC+02:00) Атина / Букурещ / Хелсинки',
+ 'E. Europe Standard Time':'(UTC+02:00) Кишинев',
+ 'Turkish Standard Time':'(UTC+03:00) Истанбул',
+ 'Russian Standard Time':'(UTC+03:00) Москва / Санкт Петербург',
+ 'GMT Standard Time':'(UTC+00:00) Дъблин / Лондон / Лисабон',
+ 'UTC':'(UTC) координирано универсално време',
+ 'Azores Standard Time':'(UTC-01:00) Азорски острови',
+ 'Arabian Standard Time':'(UTC+04:00) Абу Даби / Мускат',
+ 'India Standard Time':'(UTC+05:30) Ченай / Калкута / Мумбай / Ню Делхи',
+ 'China Standard Time':'(UTC+08:00) Пекин / Чунцин / Хонконг',
+ 'Korea Standard Time':'(UTC+09:00) Сеул',
+ 'Tokyo Standard Time':'(UTC+09:00) Осака / Сапоро / Токио',
+ 'AUS Eastern Standard Time':'(UTC+10:00) Канбера / Мелбърн / Сидни',
+ 'US Eastern Standard Time':'(UTC-05:00) Ню Йорк / Вашингтон / Бостън',
+ 'US Pacific Standard Time':'(UTC-08:00) Лос Анджелис / Сиатъл / Сан Франциско'
+};
+function tzLabel(z){
+  if(LANG==='en'&&window.I18N_EN&&I18N_EN.tz&&I18N_EN.tz[z])return I18N_EN.tz[z];
+  return TZ_BG[z]||z;
+}
 const TZ=['FLE Standard Time','Central Europe Standard Time','Central European Standard Time','W. Europe Standard Time','Romance Standard Time','GTB Standard Time','E. Europe Standard Time','Turkish Standard Time','Russian Standard Time','GMT Standard Time','UTC','Azores Standard Time','Arabian Standard Time','India Standard Time','China Standard Time','Korea Standard Time','Tokyo Standard Time','AUS Eastern Standard Time','US Eastern Standard Time','US Pacific Standard Time'];
 const LANG_OPTS=[['bg-BG','Български'],['en-US','English (US)'],['en-GB','English (UK)'],['de-DE','Deutsch'],['fr-FR','Français'],['it-IT','Italiano'],['es-ES','Español'],['pt-BR','Português (BR)'],['nl-NL','Nederlands'],['sv-SE','Svenska'],['pl-PL','Polski'],['hu-HU','Magyar'],['cs-CZ','Čeština'],['ro-RO','Română'],['el-GR','Ελληνικά'],['tr-TR','Türkçe'],['ru-RU','Русский'],['uk-UA','Українська'],['sr-Latn-RS','Srpski'],['mk-MK','Македонски'],['ja-JP','日本語'],['ko-KR','한국어'],['zh-CN','中文(简体)']];
 
@@ -1024,6 +1783,7 @@ const ROLEPRESETS=[
   set:{f_wsl:1,f_sandbox:1,appsPreset:'none',t_bing:1}}
 ];
 function applyRolePreset(id){
+  if(id==='myp'){applyMyProfile();return}
   if(id==='recommended'){
     S_st.appsMap=Object.assign({},defaults.appsMap);
     for(const k of ['Google.Chrome','7zip.7zip','VideoLAN.VLC','Notepad++.Notepad++'])S_st.appsMap[k]=1;
@@ -1298,12 +2058,12 @@ function val(id){return S_st[id]}
 /* ---------- рендер на каталога ---------- */
 function visible(s){return !s.showIf||s.showIf(S_st)}
 function baseVisible(s){return visible(s)&&(s.lvl==='green'||s.core)}
-function matches(s,q){if(!q)return true;const t=(s.label+' '+(s.what||'')+' '+(s.when||'')+' '+s.id).toLowerCase();return t.includes(q)}
+function matches(s,q){if(!q)return true;const sl=LS(s);const t=(sl.label+' '+(sl.what||'')+' '+(sl.when||'')+' '+s.id).toLowerCase();return t.includes(q)}
 
 function controlHTML(s){
   const v=S_st[s.id];
   if(s.t==='toggle')return `<label class="sw"><input type="checkbox" data-id="${s.id}" ${v?'checked':''}><i></i></label>`;
-  if(s.t==='select'){const o=s.opts.map(o=>`<option value="${esc(o[0])}" ${String(v)===String(o[0])?'selected':''}>${esc(o[1])}</option>`).join('');return `<select data-id="${s.id}">${o}</select>`}
+  if(s.t==='select'){const opts=(s.id==='timezone')?TZ.map(z=>[z,tzLabel(z)]):s.opts;const o=opts.map(o=>`<option value="${esc(o[0])}" ${String(v)===String(o[0])?'selected':''}>${esc(o[1])}</option>`).join('');return `<select data-id="${s.id}">${o}</select>`}
   if(s.t==='password')return `<input type="password" data-id="${s.id}" value="${esc(v)}" autocomplete="off">`;
   if(s.t==='number')return `<input type="number" data-id="${s.id}" value="${esc(v)}" min="0" style="min-width:90px">`;
   if(s.t==='note')return '';
@@ -1320,21 +2080,22 @@ function driversToolHTML(){
   <div class="card lv-amber">
     <div class="row">
       <span class="dot" style="background:var(--amber)"></span>
-      <span class="lbl">Намери и свали драйвер пакет<span class="pill p-amber">РАЗШИРЕНА</span></span>
+      <span class="lbl">${U('findDriverPkg','Намери и свали драйвер пакет')}<span class="pill p-amber">РАЗШИРЕНА</span></span>
       <select id="drvVendor" style="min-width:110px"><option value="lenovo">Lenovo</option><option value="dell">Dell</option><option value="hp">HP</option></select>
-      <input type="text" id="drvModel" placeholder="модел, напр. ThinkPad E590" style="min-width:180px">
-      <button class="mbtn sec" id="drvSearch">🔍 Официална търсачка</button>
+      <input type="text" id="drvModel" data-i18n-ph="drvModelPlaceholder" placeholder="модел, напр. ThinkPad E590" style="min-width:180px">
+      <button class="mbtn sec" id="drvSearch">${U('drvSearchBtn','🔍 Официална търсачка')}</button>
     </div>
     <div class="row" style="margin-top:8px">
-      <input type="text" id="drvUrl" placeholder="директен https URL на пакета (download.lenovo.com/… , download.dell.com/…)" style="flex:1;min-width:280px">
-      <button class="mbtn" id="drvDownload">⚡ Свали пакета</button>
+      <input type="text" id="drvUrl" data-i18n-ph="drvUrlPlaceholder" placeholder="директен https URL на пакета (download.lenovo.com/… , download.dell.com/…)" style="flex:1;min-width:280px">
+      <button class="mbtn" id="drvDownload">${U('drvDownloadBtn','⚡ Свали пакета')}</button>
     </div>
     <p class="hint">Флоу: 🔍 отваря официалната търсачка за модела → намери пакета (.zip/.cab/.iso) → копирай директния линк → ⚡ сваля в <b>Downloads\\WinSetupStudio-drivers\\</b> → копирай в <b>\\drivers</b> на флашката (група 10 го инсталира при първия вход). Познатите модели добавям по заявка — списъкът расте.</p>
   </div>`;
 }
 function cardHTML(s){
+  s=LS(s);
   if(s.t==='note')return `<div class="note" data-card="${s.id}"><b>${esc(s.label)}</b> — ${esc(s.what)}</div>`;
-  const pill=s.lvl==='green'?'БАЗОВА':s.lvl==='amber'?'РАЗШИРЕНА':'ОПАСНА';
+  const pill=s.lvl==='green'?U('pillBasic','БАЗОВА'):s.lvl==='amber'?U('pillAdvanced','РАЗШИРЕНА'):U('pillDangerous','ОПАСНА');
   return `<div class="card lv-${s.lvl}" data-card="${s.id}">
     <div class="row">
       <span class="dot"></span>
@@ -1342,50 +2103,53 @@ function cardHTML(s){
       ${controlHTML(s)}
     </div>
     ${warnHTML(s)}
-    ${s.what?`<details class="more"><summary>Какво е това? Подробно обяснение</summary><div class="body">
-      <p><b>Какво прави:</b> ${esc(s.what)}</p>
-      ${s.when?`<p><b>Кога го искаш:</b> ${esc(s.when)}</p>`:''}
-      ${s.risk?`<p><b>Риск / бележки:</b> ${esc(s.risk)}</p>`:''}
+    ${s.what?`<details class="more"><summary>${U('whatIsThis','Какво е това? Подробно обяснение')}</summary><div class="body">
+      <p><b>${U('whatItDoes','Какво прави:')}</b> ${esc(s.what)}</p>
+      ${s.when?`<p><b>${U('whenYouWantIt','Кога го искаш:')}</b> ${esc(s.when)}</p>`:''}
+      ${s.risk?`<p><b>${U('riskNotes','Риск / бележки:')}</b> ${esc(s.risk)}</p>`:''}
     </div></details>`:''}
   </div>`;
 }
 /* --- акаунти (група 5) --- */
 function accountsHTML(){
   let h='<div class="grouph" id="sec-users"><h2>👤 5. Потребители</h2><span class="gdesc">Акаунти, пароли, автологин</span></div>';
-  h+='<div class="note">Създадените тук <b>локални акаунти се записват директно във файла</b> — OOBE не пита нищо и НЕ иска Microsoft акаунт. AutoLogon влиза с първия администратор веднъж, за да изпълни твиксовете.</div>';
+  h+='<div class="note">'+U('accountsNote','Създадените тук <b>локални акаунти се записват директно във файла</b> — OOBE не пита нищо и НЕ иска Microsoft акаунт. AutoLogon влиза с първия администратор веднъж, за да изпълни твиксовете.')+'</div>';
   S_st.accounts.forEach((a,i)=>{
     h+=`<div class="accrow" data-acc="${i}">
       <div class="row" style="margin-bottom:8px">
-        <span class="pill p-${a.admin?'green':'amber'}">${a.admin?'АДМИНИСТРАТОР':'СТАНДАРТЕН'}</span>
-        ${S_st.accounts.length>1?`<button class="del" data-accdel="${i}">✕ Махни</button>`:''}
+        <span class="pill p-${a.admin?'green':'amber'}">${a.admin?U('accAdmin','АДМИНИСТРАТОР'):U('accStandard','СТАНДАРТЕН')}</span>
+        ${S_st.accounts.length>1?`<button class="del" data-accdel="${i}">${U('accRemove','✕ Махни')}</button>`:''}
       </div>
       <div class="row">
-        <div><label>Потребителско име (латиница, без интервали)</label><input data-accf="name" data-acci="${i}" value="${esc(a.name)}" placeholder="niki5"></div>
-        <div><label>Видимо име (може кирилица)</label><input data-accf="display" data-acci="${i}" value="${esc(a.display)}" placeholder="Николай"></div>
-        <div><label>Парола</label><span style="display:flex;gap:4px"><input type="password" data-accf="password" data-acci="${i}" value="${esc(a.password)}" autocomplete="off" style="min-width:150px"><button class="eye" data-eye="1" title="Покажи/скрий паролата">👁</button></span></div>
+        <div><label>${U('accNameLabel','Потребителско име (латиница, без интервали)')}</label><input data-accf="name" data-acci="${i}" value="${esc(a.name)}" placeholder="niki5"></div>
+        <div><label>${U('accDisplayLabel','Видимо име (може кирилица)')}</label><input data-accf="display" data-acci="${i}" value="${esc(a.display)}" placeholder="Николай"></div>
+        <div><label>${U('accPasswordLabel','Парола')}</label><span style="display:flex;gap:4px"><input type="password" data-accf="password" data-acci="${i}" value="${esc(a.password)}" autocomplete="off" style="min-width:150px"><button class="eye" data-eye="1" title="${U('accEyeTitle','Покажи/скрий паролата')}">👁</button></span></div>
       </div>
       <div class="row" style="margin-top:8px">
         <label class="sw" style="margin-top:4px"><input type="checkbox" data-accf="admin" data-acci="${i}" ${a.admin?'checked':''}><i></i></label>
-        <span style="font-size:12.5px">Администраторски права</span>
-        <div style="flex:1;min-width:180px"><label>Описание (опционално)</label><input data-accf="desc" data-acci="${i}" value="${esc(a.desc)}" style="width:100%" placeholder="личен акаунт"></div>
+        <span style="font-size:12.5px">${U('accAdminRights','Администраторски права')}</span>
+        <div style="flex:1;min-width:180px"><label>${U('accDescLabel','Описание (опционално)')}</label><input data-accf="desc" data-acci="${i}" value="${esc(a.desc)}" style="width:100%" placeholder="личен акаунт"></div>
       </div>
     </div>`;
   });
-  h+=`<button class="addacc" id="addAcc">＋ Добави още акаунт (напр. стандартен за дете/колега)</button>`;
+  h+=`<button class="addacc" id="addAcc">＋ ${U('accAddMore','Добави още акаунт (напр. стандартен за дете/колега)')}</button>`;
   h+=S.filter(x=>x.g==='users'&&visible(x)&&baseVisible(x)).map(cardHTML).join('');
   return h;
 }
 /* --- приложения (група 8) --- */
 function appsHTML(){
   let h='<div class="grouph" id="sec-apps"><h2>📦 8. Приложения</h2><span class="gdesc">Авто-инсталация при първия вход (каталог + winget)</span></div>';
-  h+='<div class="note">Отметнатите се инсталират <b>автоматично при първия вход</b> през winget (тихо, с приемане на лицензи). Работи като авто-скрипт тип „Крис Титус“, но олекотено: избираш само това, което ти трябва. Нужен е интернет при първия вход.</div>';
-  h+='<div class="appcat">👤 Профили по роля — 1 клик</div>';
-  h+=`<div class="appitem"><span class="dot" style="background:var(--green)"></span><span class="lbl">✨ Препоръчителен пакет</span><span class="hint" style="flex:2;min-width:180px">безопасни твиксове + лек debloat + 4 базови приложения — за всеки комп</span><button class="mbtn sec" data-role="recommended">Приложи</button></div>`;
-  ROLEPRESETS.forEach(p=>{
-    h+=`<div class="appitem"><span style="font-size:16px">${p.ic}</span><span class="lbl">${esc(p.n)}</span><span class="hint" style="flex:2;min-width:180px">${esc(p.d)}</span><button class="mbtn sec" data-role="${p.id}">Приложи</button></div>`;
+  h+='<div class="note">'+U('appsNote','Отметнатите се инсталират <b>автоматично при първия вход</b> през winget (тихо, с приемане на лицензи). Работи като авто-скрипт тип „Крис Титус“, но олекотено: избираш само това, което ти трябва. Нужен е интернет при първия вход.')+'</div>';
+  h+='<div class="appcat">'+U('rolesHeader','👤 Профили по роля — 1 клик')+'</div>';
+  h+=`<div class="appitem" style="border-left-color:var(--blue)"><span style="font-size:15px">⭐</span><span class="lbl">${LANG==='en'?'⭐ My profile (Nikolay) v1.0':'⭐ Мой профил (Николай) v1.0'}</span><span class="hint" style="flex:2;min-width:180px">${LANG==='en'?'predefined from the scan of your PC — settings + catalog apps':'предефиниран от скана на твоя комп — настройки и приложения от каталога'}</span><button class="mbtn sec" data-role="myp">${U('applyBtn','Приложи')}</button></div>`;
+  h+=`<div class="appitem"><span class="dot" style="background:var(--green)"></span><span class="lbl">✨ ${U('recommendedPreset','Препоръчителен пакет')}</span><span class="hint" style="flex:2;min-width:180px">${U('recommendedDesc','безопасни твиксове + лек debloat + 4 базови приложения — за всеки комп')}</span><button class="mbtn sec" data-role="recommended">${U('applyBtn','Приложи')}</button></div>`;
+  ROLEPRESETS.forEach(pp=>{
+    const rp=LROLE(pp);
+    h+=`<div class="appitem"><span style="font-size:16px">${rp.ic}</span><span class="lbl">${esc(rp.n)}</span><span class="hint" style="flex:2;min-width:180px">${esc(rp.d)}</span><button class="mbtn sec" data-role="${rp.id}">${U('applyBtn','Приложи')}</button></div>`;
   });
-  h+='<div class="appcat">📦 Каталог приложения (winget)</div>';
-  APPCATALOG.forEach(cat=>{
+  h+='<div class="appcat">'+U('catalogHeader','📦 Каталог приложения (winget)')+'</div>';
+  APPCATALOG.forEach(cc=>{
+    const cat=LAPP(cc);
     h+=`<div class="appcat">${esc(cat.cat)}</div>`;
     cat.items.forEach(it=>{
       const on=!!S_st.appsMap[it.id];
@@ -1401,8 +2165,8 @@ function appsHTML(){
   h+=`<div class="card lv-amber" style="margin-top:12px">
     <div class="row">
       <span class="dot" style="background:var(--amber)"></span>
-      <span class="lbl">Допълнителни winget ID-та (запетайки)<span class="pill p-amber">РАЗШИРЕНА</span></span>
-      <input type="text" data-id="wingetapps" value="${esc(S_st.wingetapps||'')}" placeholder="напр. 7zip.7zip, VideoLAN.VLC" style="flex:1;min-width:240px">
+      <span class="lbl">${U('extraWingetIds','Допълнителни winget ID-та (запетайки)')}<span class="pill p-amber">РАЗШИРЕНА</span></span>
+      <input type="text" data-id="wingetapps" value="${esc(S_st.wingetapps||'')}" data-i18n-ph="extraWingetPlaceholder" placeholder="напр. 7zip.7zip, VideoLAN.VLC" style="flex:1;min-width:240px">
     </div>
     <details class="more"><summary>Какво е това? Подробно обяснение</summary><div class="body">
       <p><b>Какво прави:</b> Прилага се към списъка от отметки — при първия вход скриптът изпълнява <b>winget install --id &lt;ID&gt;</b> за всеки (тихо, с приемане на лицензи).</p>
@@ -1419,13 +2183,14 @@ function renderContent(){
   GROUPS.forEach(g=>{
     if(MODE==='post'&&!['features','apps','debloat','fixes'].includes(g.id))return;
     if(g.id==='users'){
-      if(!q||'акаунт акаунти потребител потребители парола пароли autologon вход admin'.includes(q)){
+      const hay='акаунт акаунти потребител потребители парола пароли autologon вход admin account user users password passwords logon';
+      if(!q||hay.includes(q)){
         html+=accountsHTML();totalVis+=S_st.accounts.length;
       }
       return;
     }
     if(g.id==='apps'){
-      const hay='8. Приложения приложения apps winget програми инсталация софтуер';
+      const hay='8. Приложения приложения apps winget програми инсталация софтуер '+U('appsSearchHay','')+' '+U('usersSearchHay','');
       const appHit=APPCATALOG.some(c=>c.items.some(i=>(i.n+' '+i.id+' '+i.h).toLowerCase().includes(q)));
       if(!q||hay.includes(q)||appHit){
         html+=appsHTML();totalVis+=APPCATALOG.reduce((n,c)=>n+c.items.length,0);
@@ -1436,17 +2201,21 @@ function renderContent(){
     if(!items.length)return;
     totalVis+=items.length;
     const changed=S.filter(x=>x.g===g.id&&JSON.stringify(S_st[x.id])!==JSON.stringify(defaults[x.id])).length;
-    html+=`<div class="grouph" id="sec-${g.id}"><h2>${g.ic} ${esc(g.title)}</h2><span class="gdesc">${esc(g.desc)}</span>${changed?`<span class="badge" style="color:var(--blue)">променени: ${changed}</span>`:''}</div>`;
+    const gl=LG(g);
+    html+=`<div class="grouph" id="sec-${g.id}"><h2>${gl.ic} ${esc(gl.title)}</h2><span class="gdesc">${esc(gl.desc)}</span>${changed?`<span class="badge" style="color:var(--blue)">${U('changedBadge','променени: '+changed).replace('{n}',changed)}</span>`:''}</div>`;
     html+=items.map(cardHTML).join('');
     if(g.id==='drivers'&&!q)html+=driversToolHTML();
   });
-  if(!html)html='<div class="note">Няма настройки, отговарящи на търсенето.</div>';
+  if(!html)html='<div class="note">'+U('noMatch','Няма настройки, отговарящи на търсенето.')+'</div>';
   $('content').innerHTML=html;
-  $('countInfo').textContent=`${totalVis} видими настройки · ${S.length+APPCATALOG.reduce((n,c)=>n+c.items.length,0)} общо в ${GROUPS.length} групи`;
+  const ci=U('countInfoTpl',null);
+  const totalAll=S.length+APPCATALOG.reduce((n,c)=>n+c.items.length,0);
+  $('countInfo').textContent=ci?ci.replace('{visible}',totalVis).replace('{total}',totalAll).replace('{groups}',GROUPS.length):`${totalVis} / ${totalAll} · ${GROUPS.length}`;
   updateNavCounts();updateProgress();
 }
 function renderNav(){
-  $('gnav').innerHTML=GROUPS.map(g=>`<a class="grp" data-g="${g.id}" onclick="document.getElementById('sec-'+this.dataset.g).scrollIntoView({behavior:'smooth'})"><span class="ic">${g.ic}</span><span>${esc(g.title)}</span><span class="cnt">0</span></a>`).join('');
+  const navGroups=GROUPS.filter(g=>MODE!=='post'||['features','apps','debloat','fixes'].includes(g.id));
+  $('gnav').innerHTML=navGroups.map(g=>{const gl=LG(g);return `<a class="grp" data-g="${g.id}" onclick="const el=document.getElementById('sec-'+this.dataset.g);if(el)el.scrollIntoView({behavior:'smooth'})"><span class="ic">${gl.ic}</span><span>${esc(gl.title)}</span><span class="cnt">0</span></a>`}).join('');
 }
 function updateNavCounts(){
   document.querySelectorAll('#gnav .grp').forEach(el=>{
@@ -1635,7 +2404,8 @@ function buildTweaksScript(){
   if(val('t_hiberboot'))P.push("Sec 'hiberboot' { reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power\" /v HiberbootEnabled /t REG_DWORD /d 0 /f | Out-Null }");
   if(val('t_hibernate'))P.push("Sec 'hibernate' { & powercfg /hibernate off | Out-Null }");
   if(val('t_powerplan'))P.push("Sec 'powerplan' { & powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c | Out-Null }");
-  const defer=String(val('t_wudefer')||'0');
+  const deferRaw=String(val('t_wudefer')||'0');
+  const defer=/^\d{1,4}$/.test(deferRaw)?deferRaw:'0';
   if(defer!=='0')P.push(`Sec 'wu-defer' { reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\" /v DeferFeatureUpdatesPeriodInDays /t REG_DWORD /d ${defer} /f | Out-Null; reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\" /v DeferQualityUpdatesPeriodInDays /t REG_DWORD /d 7 /f | Out-Null }`);
   if(val('fx_wurepair'))P.push("Sec 'wu-repair' { foreach($s in 'wuauserv','bits','cryptsvc'){ Stop-Service $s -Force -ErrorAction SilentlyContinue }; Rename-Item \"$env:WINDIR\\SoftwareDistribution\" 'SoftwareDistribution.old' -ErrorAction SilentlyContinue; Rename-Item \"$env:WINDIR\\System32\\catroot2\" 'catroot2.old' -ErrorAction SilentlyContinue; foreach($s in 'cryptsvc','bits','wuauserv'){ Start-Service $s -ErrorAction SilentlyContinue }; & usoclient StartScan | Out-Null }");
   if(val('fx_winsock'))P.push("Sec 'winsock' { & netsh winsock reset | Out-Null; & netsh int ip reset | Out-Null; & ipconfig /flushdns | Out-Null }");
@@ -1814,7 +2584,7 @@ ${val('domainou')?'          <MachineObjectOU>'+esc(val('domainou'))+'</MachineO
 
   const xml=
 `<?xml version="1.0" encoding="utf-8"?>
-<!-- Generated by WinSetup Studio 1.3.0 (${new Date().toLocaleString('bg-BG')}) -->
+<!-- Generated by WinSetup Studio 1.4.0 (${new Date().toLocaleString('bg-BG')}) -->
 <!-- Сложи този файл в ROOT (главната папка) на инсталационната флашка. -->
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
 ${pass('windowsPE',[peIntl,setupComp])}
@@ -1832,40 +2602,40 @@ ${pass('oobeSystem',[ooIntl,ooComp])}
 function computeIssues(){
   const errs=[],warns=[],pre=(MODE==='pre');
   if(pre&&(val('diskmode')==='auto-uefi'||val('diskmode')==='auto-bios')&&!val('wipeconfirm'))
-    errs.push('Автоматичният режим ИЗТРИВА диск 0 — дай отметка на „Потвърждавам“ в група „Дялове“ (изискване за безопасност).');
+    errs.push(U('errAutoWipe','Автоматичният режим ИЗТРИВА диск 0 — дай отметка на „Потвърждавам“ в група „Дялове“ (изискване за безопасност).'));
   const accs=(S_st.accounts||[]).filter(a=>a&&a.name);
   if(pre&&accs.length){
     const names=accs.map(a=>a.name);
-    if(new Set(names).size!==names.length)errs.push('Имената на акаунтите трябва да са уникални.');
+    if(new Set(names).size!==names.length)errs.push(U('errUniqueNames','Имената на акаунтите трябва да са уникални.'));
     accs.forEach(a=>{
-      if(/[А-Яа-яЁё\s]/.test(a.name))errs.push(`Акаунтът „${a.name}“: потребителското име трябва да е само латиница без интервали (видимото име може на кирилица).`);
+      if(/[А-Яа-яЁё\s]/.test(a.name))errs.push(U('errAccountLatin','Акаунтът „{name}“: потребителското име трябва да е само латиница без интервали (видимото име може на кирилица).').replace('{name}',a.name));
     });
     const prim=primaryAccount();
-    if(val('autologon')&&prim&&!(prim.password||'').length)errs.push('Автоматичният вход (AutoLogon) изисква парола на основния акаунт.');
-  }else{
-    warns.push('Няма дефиниран локален акаунт — OOBE ще пита за акаунт (при онлайн режим — Microsoft акаунт).');
-    if(val('autologon'))warns.push('AutoLogon е включен, но няма потребител — ще бъде пропуснат.');
+    if(val('autologon')&&prim&&!(prim.password||'').length)errs.push(U('errAutologonPassword','Автоматичният вход (AutoLogon) изисква парола на основния акаунт.'));
+  }else if(pre){
+    warns.push(U('warnNoAccount','Няма дефиниран локален акаунт — OOBE ще пита за акаунт (при онлайн режим — Microsoft акаунт).'));
+    if(val('autologon'))warns.push(U('warnAutologonNoUser','AutoLogon е включен, но няма потребител — ще бъде пропуснат.'));
   }
   if(pre&&val('joinmode')==='domain'){
-    if(!val('domainname'))errs.push('Избран е Domain режим, но не е въведено име на домейна (група „Мрежа и домейн“).');
-    if(!val('domainuser')||!val('domainpass'))warns.push('За domain join е нужен акаунт и парола на домейна.');
+    if(!val('domainname'))errs.push(U('errDomainNoName','Избран е Domain режим, но не е въведено име на домейна (група „Мрежа и домейн“).'));
+    if(!val('domainuser')||!val('domainpass'))warns.push(U('warnDomainCreds','За domain join е нужен акаунт и парола на домейна.'));
   }
   if(pre&&val('computername')){
     const cn=String(val('computername'));
-    if(cn.length>15||/[^A-Za-z0-9-]/.test(cn))warns.push('Името на компютъра: до 15 знака, само латиница/цифри/тирета.');
+    if(cn.length>15||/[^A-Za-z0-9-]/.test(cn))warns.push(U('warnComputerName','Името на компютъра: до 15 знака, само латиница/цифри/тирета.'));
   }
   if(pre&&val('edition')==='auto'&&!String(val('productkey')).trim())
-    warns.push('Без ключ: Setup ще избере издание автоматично (BIOS лиценз или изданието на ISO).');
-  if(pre&&val('plaintext'))warns.push('Паролите ще се запишат като ЧИСТ ТЕКСТ в XML-а.');
-  if(val('appsPreset')==='aggressive')warns.push('Агресивният debloat маха почти всичко от Store — ползвай само на познати машини.');
-  if(val('networkOOBE'))warns.push('Агресивен мрежов режим: интернет липсва до първия вход (адаптерите се включват автоматично от твикс-скрипта).');
+    warns.push(U('warnNoKey','Без ключ: Setup ще избере издание автоматично (BIOS лиценз или изданието на ISO).'));
+  if(pre&&val('plaintext'))warns.push(U('warnPlaintext','Паролите ще се запишат като ЧИСТ ТЕКСТ в XML-а.'));
+  if(val('appsPreset')==='aggressive')warns.push(U('warnAggressiveDebloat','Агресивният debloat маха почти всичко от Store — ползвай само на познати машини.'));
+  if(val('networkOOBE'))warns.push(U('warnNetworkOOBE','Агресивен мрежов режим: интернет липсва до първия вход (адаптерите се включват автоматично от твикс-скрипта).'));
   if(pre&&['Home','HomeN','HomeSL'].includes(val('edition'))&&(val('f_hyperv')||val('f_sandbox')))
-    warns.push('Hyper-V и Windows Sandbox липсват в Home издания — компонентът няма да се инсталира.');
+    warns.push(U('warnHomeFeatures','Hyper-V и Windows Sandbox липсват в Home издания — компонентът няма да се инсталира.'));
   if(pre&&['25H2','26H2'].includes(val('targetversion')))
-    warns.push('25H2/26H2 бележка: ако Setup започне да задава въпроси (новият „ConX“ режим понякога игнорира файла) — Shift+F10 → „setup.exe /Unattend:X:\\autounattend.xml“. Виж „Помощ“.');
-  if(pre&&val('dynupdate'))warns.push('Dynamic Update: инсталацията ще тегли ъпдейти от интернет (не е чисто офлайн).');
+    warns.push(U('warnConX','25H2/26H2 бележка: ако Setup започне да задава въпроси (новият „ConX“ режим понякога игнорира файла) — Shift+F10 → „setup.exe /Unattend:X:\\autounattend.xml“. Виж „Помощ“.'));
+  if(pre&&val('dynupdate'))warns.push(U('warnDynUpdate','Dynamic Update: инсталацията ще тегли ъпдейти от интернет (не е чисто офлайн).'));
   if(selectedApps().length&&val('networkOOBE'))
-    warns.push('Приложенията се инсталират при първия вход — с агресивния мрежов режим мрежата се включва точно преди това, но може да забави.');
+    warns.push(U('warnAppsNetworkOOBE','Приложенията се инсталират при първия вход — с агресивния мрежов режим мрежата се включва точно преди това, но може да забави.'));
   return {errs,warns};
 }
 
@@ -1874,47 +2644,47 @@ function updateSummary(){
   const {errs,warns}=computeIssues();
   let h='';
   if(MODE==='post'){
-    h+='<div class="postbanner">🔧 Режим „След инсталация“: същите настройки се прилагат <b>СЕГА</b> на този комп през helper-а (стартиран с админ от WinSetupStudio.cmd).</div>';
-    h+='<div class="rbtns"><button id="applyNowBtn">⚡ Приложи СЕГА на този комп</button><button id="copyBtn">📋 Копирай скрипта</button></div>';
+    h+='<div class="postbanner">'+U('postBanner','🔧 Режим „След инсталация“: същите настройки се прилагат <b>СЕГА</b> на този комп през helper-а (стартиран с админ от WinSetupStudio.cmd).')+'</div>';
+    h+='<div class="rbtns"><button id="applyNowBtn">'+U('applyNow','⚡ Приложи СЕГА на този комп')+'</button><button id="copyBtn">'+U('copyScript','📋 Копирай скрипта')+'</button></div>';
   } else {
-    h+='<div class="rbtns"><button id="genBtn">💾 Генерирай autounattend.xml</button><button id="copyBtn">📋 Копирай XML</button></div>';
+    h+='<div class="rbtns"><button id="genBtn">'+U('genBtn','💾 Генерирай autounattend.xml')+'</button><button id="copyBtn">'+U('copyXml','📋 Копирай XML')+'</button></div>';
   }
   if(errs.length)h+=errs.map(e=>`<div class="iss err">⛔ ${esc(e)}</div>`).join('');
   if(warns.length)h+=warns.map(w=>`<div class="iss warn">⚠️ ${esc(w)}</div>`).join('');
-  if(!errs.length&&!warns.length)h+='<div class="iss ok">✅ Проверките минаха чисто. Генерирай и сложи файла в ROOT на флашката.</div>';
+  if(!errs.length&&!warns.length)h+='<div class="iss ok">'+U('checksOk','✅ Проверките минаха чисто. Генерирай и сложи файла в ROOT на флашката.')+'</div>';
   const accList=(S_st.accounts||[]).filter(a=>a&&a.name).map(a=>a.name+(a.admin?'*':'')).join(', ');
   const apps=selectedApps().length;
   const rows=[
-    ['Версия',()=>val('targetversion')],
-    ['Издание',()=>val('edition')==='auto'?'без ключ':val('edition')],
-    ['Език',()=>val('uilanguage')],
-    ['Часова зона',()=>val('timezone')],
-    ['Bypass хардуер',()=>val('bypasshw')?'ДА':'не'],
-    ['Дялове',()=>({manual:'ръчно',['auto-uefi']:'АВТОМАТИЧНО (изтриване диск 0!)',['auto-bios']:'АВТОМАТИЧНО BIOS (изтриване!)',avail:'първия подходящ дял'})[val('diskmode')]],
-    ['Акаунти',()=>accList||'— (ще пита в OOBE)'],
-    ['AutoLogon',()=>val('autologon')?'да ('+((primaryAccount()&&primaryAccount().name)||'—')+')':'не'],
-    ['Приложения',()=>apps?apps+' бр. (winget)':'без'],
-    ['Debloat',()=>val('appsPreset')==='none'?'без':val('appsPreset')],
-    ['Домейн',()=>val('joinmode')==='domain'?(val('domainname')||'въведи име'):'Workgroup'],
-    ['Твикс-скрипт',()=>buildTweaksScript()?'ще се вгради в XML (base64)':'не е нужен'],
-    ['Мрежа',()=>(val('computername')?val('computername'):'авто-име')]
+    [U('sumVersion','Версия'),()=>val('targetversion')],
+    [U('sumEdition','Издание'),()=>val('edition')==='auto'?U('valNoKey','без ключ'):val('edition')],
+    [U('sumLang','Език'),()=>val('uilanguage')],
+    [U('sumTimezone','Часова зона'),()=>tzLabel(val('timezone'))],
+    [U('sumBypass','Bypass хардуер'),()=>val('bypasshw')?U('valYes','ДА'):U('valNoLower','не')],
+    [U('sumDisks','Дялове'),()=>({manual:U('valManual','ръчно'),['auto-uefi']:U('valAutoUefi','АВТОМАТИЧНО (изтриване диск 0!)'),['auto-bios']:U('valAutoBios','АВТОМАТИЧНО BIOS (изтриване!)'),avail:U('valAvail','първия подходящ дял')})[val('diskmode')]],
+    [U('sumAccounts','Акаунти'),()=>accList||U('valAccountsNone','— (ще пита в OOBE)')],
+    [U('sumAutologon','AutoLogon'),()=>val('autologon')?U('valYesLower','да')+' ('+((primaryAccount()&&primaryAccount().name)||'—')+')':U('valNoLower','не')],
+    [U('sumApps','Приложения'),()=>apps?U('valAppsCount','{n} приложения (winget)').replace('{n}',apps):U('valNone','без')],
+    [U('sumDebloat','Debloat'),()=>val('appsPreset')==='none'?U('valNone','без'):val('appsPreset')],
+    [U('sumDomain','Домейн'),()=>val('joinmode')==='domain'?(val('domainname')||U('valEnterName','въведи име')):U('valWorkgroup','Workgroup')],
+    [U('sumTweakScript','Твикс-скрипт'),()=>buildTweaksScript()?U('valTweakEmbedded','ще се вгради в XML (base64)'):U('valTweakNotNeeded','не е нужен')],
+    [U('sumNetwork','Мрежа'),()=>(val('computername')?val('computername'):U('valAutoName','авто-име'))]
   ];
-  h+='<h4 style="margin:14px 0 6px">Обобщение</h4>';
+  h+='<h4 style="margin:14px 0 6px">'+U('summaryHeading','Обобщение')+'</h4>';
   rows.forEach(r=>{
     let v;try{v=r[1]()}catch(e){v='—'}
     h+=`<div class="sumline"><span class="k">${r[0]}:</span><span>${esc(String(v))}</span></div>`;
   });
-  h+='<div class="hint" style="margin-top:10px">Файлът се казва <b>autounattend.xml</b> и се слага в <b>root</b> на флашката (до setup.exe, не в папка).</div>';
+  h+='<div class="hint" style="margin-top:10px">'+U('sumNote','Файлът се казва <b>autounattend.xml</b> и се слага в <b>root</b> на флашката (до setup.exe, не в папка).')+'</div>';
   $('tab-sum').innerHTML=h;
   const gb=$('genBtn');
   if(gb){gb.onclick=generate;gb.disabled=errs.length>0}
   const ab=$('applyNowBtn');
   if(ab)ab.onclick=()=>{
     const s=buildTweaksScript();
-    if(!s){toast('Няма избрани твиксове/приложения за прилагане.');return}
+    if(!s){toast(U('applyNoTweaks','Няма избрани твиксове/приложения за прилагане.'));return}
     ab.disabled=true;ab.textContent='⏳ Стартирам…';
     hFetch('api/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({script:s})})
-      .then(r=>r.json()).then(j=>{if(j.error)toast('Грешка: '+j.error);else toast('Скриптът стартира в PowerShell прозореца — гледай изхода там.')})
+      .then(r=>r.json()).then(j=>{if(j.error)toast(U('errorPrefix','Грешка: ').replace('{msg}',j.error));else toast(U('applyStarted','Скриптът стартира в PowerShell прозореца — гледай изхода там.'))})
       .catch(e=>toast('Helper грешка: '+e.message))
       .finally(()=>{ab.disabled=false;ab.textContent='⚡ Приложи СЕГА на този комп'});
   };
@@ -1933,15 +2703,15 @@ function generate(){
   const {errs}=computeIssues();
   if(errs.length){toast('Има неуредени грешки — виж „Резюме“.');return}
   download('autounattend.xml',buildXML(),'application/xml');
-  toast('Свален: autounattend.xml — сложи го в ROOT на флашката!');
+  toast(U('genDone','Свален: autounattend.xml — сложи го в ROOT на флашката!'));
 }
 function copyXML(){
-  copyText(buildXML(),'XML-ът е в клипборда.');
+  copyText(buildXML(),U('xmlCopied','XML-ът е в клипборда.'));
 }
 function copyText(t,msg){
   const done=()=>toast(msg);
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(x).then(done).catch(()=>fallbackCopy(x,done))}
-  else fallbackCopy(x,done);
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(()=>fallbackCopy(t,done))}
+  else fallbackCopy(t,done);
 }
 function fallbackCopy(t,done){
   const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();
@@ -1981,7 +2751,7 @@ function importProfileText(txt,name){
   if(o&&o.matchedApps&&Array.isArray(o.matchedApps)){
     let m=0;
     for(const id of o.matchedApps){if(APPCATALOG.some(c=>c.items.some(i=>i.id===id))){S_st.appsMap[id]=1;m++}}
-    if(m)setTimeout(()=>toast('От скана: '+m+' приложения от каталога вече са на компа — отбелязани.'),300);
+    if(m)setTimeout(()=>toast(U('scanMatched','От скана: {count} приложения от каталога вече са на компа — отбелязани.').replace('{count}',m)),300);
     n++;
   }
   if(o&&o.settings&&'wingetapps' in o.settings){S_st.wingetapps=o.settings.wingetapps;n++}
@@ -1992,18 +2762,33 @@ function importProfileText(txt,name){
   lastProfile=o;
   S_st.__keyManual=false;
   saveState();renderContent();updatePreview();updateSummary();
-  toast(`Импортирани ${n} стойности от ${name||'файла'}.`);
+  toast(U('importedValues','Импортирани {count} стойности от {name}.').replace('{count}',n).replace('{name}',name||'файла'));
   if(o&&o.programs){
     const np=$('tab-sum');
     const info=document.createElement('div');
     info.className='iss ok';
-    info.innerHTML=`ℹ️ Старият компютър имаше ${o.programs.length} инсталирани програми. Първите: ${o.programs.slice(0,8).map(esc).join(', ')}${o.programs.length>8?'…':''}. Избери съответните от група „Приложения“.`;
+    info.innerHTML=U('oldPcPrograms','ℹ️ Старият комп имаше {count} инсталирани програми. Първите: {list}… Избери съответните от група „Приложения“.').replace('{count}',o.programs.length).replace('{list}',o.programs.slice(0,8).map(esc).join(', '));
+    const pb=document.createElement('button');pb.className='mbtn sec';pb.textContent='📋 '+(LANG==='en'?'Installed programs':'Инсталирани програми');pb.onclick=()=>showProgramsPanel();info.appendChild(document.createElement('br'));info.appendChild(pb);
     np.insertBefore(info,np.firstChild.nextSibling);
   }
 }
 
 /* ---------- helper (автоматичен режим: 1 клик вместо сваляне/стартиране) ---------- */
 const HELPER={mode:'file',admin:false,base:''};
+let LANG='bg';
+function U(key,fallback){if(LANG==='en'&&window.I18N_EN&&I18N_EN.ui&&I18N_EN.ui[key]!=null)return I18N_EN.ui[key];return fallback}
+function LS(s){if(LANG==='en'&&window.I18N_EN&&I18N_EN.settings&&I18N_EN.settings[s.id])return Object.assign({},s,I18N_EN.settings[s.id]);return s}
+function LG(g){if(LANG==='en'&&window.I18N_EN&&I18N_EN.groups&&I18N_EN.groups[g.id])return Object.assign({},g,I18N_EN.groups[g.id]);return g}
+function LAPP(cat){if(LANG==='en'&&window.I18N_EN&&I18N_EN.apps){const cn=I18N_EN.apps.cats&&I18N_EN.apps.cats[cat.cat]||cat.cat;const items=cat.items.map(i=>{const o=I18N_EN.apps.items&&I18N_EN.apps.items[i.id];return o?Object.assign({},i,o):i});return {cat:cn,items:items}}return cat}
+function LROLE(r){if(LANG==='en'&&window.I18N_EN&&I18N_EN.roles&&I18N_EN.roles[r.id])return Object.assign({},r,I18N_EN.roles[r.id]);return r}
+function setLang(l){LANG=l;try{localStorage.setItem('wss-lang',l)}catch(e){}$('btnLang').textContent=(l==='bg'?'🌐 EN':'🌐 BG');document.documentElement.lang=l;applyLang();renderNav();renderContent();updatePreview();updateSummary();renderHelpTab()}
+function applyLang(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');const v=U(k,null);if(v!=null)el.textContent=v});
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{const k=el.getAttribute('data-i18n-ph');const v=U(k,null);if(v!=null)el.setAttribute('placeholder',v)});
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{const k=el.getAttribute('data-i18n-title');const v=U(k,null);if(v!=null)el.setAttribute('title',v)});
+  document.title=U('docTitle','WinSetup Studio');
+  $('btnLang').textContent=(LANG==='bg'?'🌐 EN':'🌐 BG');
+}
 const WSS_TOKEN='__WSS_TOKEN__'; // helper-ът инжектира сесионния токен при сервиране
 const WSS_NONCE='__WSS_NONCE__'; // nonce за /api/apply (unforgeable capability)
 function hFetch(p,opts){opts=opts||{};opts.headers=Object.assign({'X-WSS-Token':WSS_TOKEN},opts.headers||{});return fetch(HELPER.base+p,opts)}
@@ -2025,18 +2810,33 @@ function probeHelper(){
 }
 
 
+
+/* ⭐ Мой профил v1.0 (Николай) — от скан на моята машина (настройки + програми) */
+const MY_PROFILE = {"type": "winsetup-studio-profile", "version": "1.0", "name": "Мой профил (Николай) v1.0", "settings": {"computername": "E590-MI", "username": "niki5", "uilanguage": "en-US", "userlocale": "en-US", "systemlocale": "en-US", "inputlocale": "0409:00000409;0402:00040402", "timezone": "FLE Standard Time", "edition": "Professional", "targetversion": "25H2"}, "matchedApps": ["7zip.7zip", "Adobe.Acrobat.Reader.64-bit", "AnyDesk.AnyDesk", "Brave.Brave", "Docker.DockerDesktop", "famatech.AdvancedIPScanner", "foobar2000.foobar2000", "Git.Git", "Google.Chrome", "Notepad++.Notepad++", "OBSProject.OBSStudio", "OpenJS.NodeJS.LTS", "PuTTY.PuTTY", "qBittorrent.qBittorrent", "VideoLAN.VLC", "WiresharkFoundation.Wireshark"], "accounts": [{"name": "niki5", "display": "", "password": "", "admin": true, "desc": "личен акаунт (от скан)"}]};
+function applyMyProfile(){
+  if(typeof MY_PROFILE==='undefined'||!MY_PROFILE){toast('Мой профил v1.0 не е вграден в тази версия.');return}
+  S_st.appsMap=Object.assign({},defaults.appsMap);
+  const st=MY_PROFILE.settings||{};
+  S.forEach(x=>{if(x.id in st){const v=st[x.id];if(typeof defaults[x.id]==='boolean')S_st[x.id]=(v===true||v==='true'||v===1);else if(typeof defaults[x.id]==='number'&&v!==''&&v!=null)S_st[x.id]=Number(v);else S_st[x.id]=v}});
+  (MY_PROFILE.matchedApps||[]).forEach(id=>{if(APPCATALOG.some(c=>c.items.some(i=>i.id===id)))S_st.appsMap[id]=1});
+  if(MY_PROFILE.settings&&'wingetapps' in MY_PROFILE.settings)S_st.wingetapps=MY_PROFILE.settings.wingetapps;
+  if(MY_PROFILE.accounts&&MY_PROFILE.accounts.length)S_st.accounts=MY_PROFILE.accounts;
+  saveState();renderContent();updatePreview();updateSummary();
+  toast('⭐ Мой профил (Николай) v1.0 приложен — коригирай свободно.');
+}
+
 /* ---------- Режим: Преди / След инсталация (два клона) ---------- */
 let MODE='pre';
 function setMode(m,skipConfirm){
   if(m==='post'&&!skipConfirm){
-    if(!confirm('Режим „След инсталация“: същите настройки ще се прилагат СЕГА на този комп (debloat, поправки, приложения — през helper-а с админ). Смени ли режима?'))return;
+    if(!confirm(U('postModeConfirm','Режим „След инсталация“: същите настройки ще се прилагат СЕГА на този комп (debloat, поправки, приложения — през helper-а с админ). Смени ли режима?')))return;
   }
   MODE=m;
   try{localStorage.setItem('wss-mode',m)}catch(e){}
   $('mPre').classList.toggle('on',m==='pre');
   $('mPost').classList.toggle('on',m==='post');
   $('topGen').style.display=(m==='pre'?'':'none');
-  if(m==='post'&&HELPER.mode!=='helper')toast('⚠️ За изпълнение е нужен helper-ът — стартирай WinSetupStudio.cmd (с админ).');
+  if(m==='post'&&HELPER.mode!=='helper')toast(U('postModeNeedsHelper','⚠️ За изпълнение е нужен helper-ът — стартирай WinSetupStudio.cmd (с админ).'));
   updateSummary();renderContent();
 }
 
@@ -2146,13 +2946,15 @@ function wizBody4(){
   const n=selectedApps().length;
   return `<div class="iss ok">Етап 4: приложения — конфигурационен скрипт (winget), вграден в autounattend.xml.</div>
   <div class="appcat">👤 Профили по роля — 1 клик</div>
-  ${ROLEPRESETS.map(p=>`<div class="appitem"><span style="font-size:15px">${p.ic}</span><span class="lbl">${esc(p.n)}</span><button class="mbtn sec" data-role="${p.id}">Приложи</button></div>`).join('')}
+  ${ROLEPRESETS.map(p=>{const rp=LROLE(p);return `<div class="appitem"><span style="font-size:15px">${rp.ic}</span><span class="lbl">${esc(rp.n)}</span><button class="mbtn sec" data-role="${p.id}">${U('applyBtn','Приложи')}</button></div>`}).join('')}
+  <div class="appitem" style="border-left-color:var(--blue)"><span style="font-size:15px">⭐</span><span class="lbl">${LANG==='en'?'⭐ My profile (Nikolay) v1.0':'⭐ Мой профил (Николай) v1.0'}</span><button class="mbtn sec" data-role="myp">${U('applyBtn','Приложи')}</button></div>
   <div class="appcat">Избрани: ${n} приложения (пълния каталог — в основния изглед)</div>
   <p><button class="mbtn" id="wizFinal">🔧 Обнови autounattend.xml на флашката (финално)</button></p>
   <div class="iss ok">🎉 Готово за boot! Boot от флашката (UEFI) → инсталацията тече сама → при първия вход се инсталират приложенията. Ако Setup задава въпроси (ConX): Shift+F10 → <b>setup.exe /Unattend:E:\\autounattend.xml</b>. Ако иска MS акаунт: <b>start ms-cxh:localonly</b>.</div>`;
 }
 function bindWizStep(){
   const on=(id,fn)=>{const el=$(id);if(el)el.onclick=fn};
+  document.querySelectorAll('#wizBody [name=wizusb]').forEach(r=>r.onchange=()=>{WIZ.usbLetter=r.value;WIZ.usbName='';updateWizNav()});
   on('wizUsbRefresh',()=>renderWizard());
   on('wizIsoDl',async()=>{
     try{const j=await(await hFetch('api/iso',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({version:$('wizIsoVer').value,language:$('wizIsoLang').value})})).json();
@@ -2166,9 +2968,11 @@ function bindWizStep(){
     if(!WIZ.usbLetter){toast('Избери флашка от списъка горе.');return}
     if(!/^.:\\.+\.iso$/i.test(p)){toast('Въведи пълния път към .iso файла.');return}
     WIZ.isoPath=p;setWizStatus('Стартирам подготовката — гледай PowerShell прозореца (потвърди с ДА)…');
+    const b1=$('wizUsbPrep');if(b1){b1.disabled=true}
     hFetch('api/usb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({isoPath:p,usbDrive:WIZ.usbLetter})})
       .then(r=>r.json()).then(j=>setWizStatus(j.error?('Грешка: '+j.error):'Стартирано — виж PowerShell прозореца (потвърди с ДА).'))
-      .catch(e=>setWizStatus('Helper грешка: '+e.message));
+      .catch(e=>setWizStatus('Helper грешка: '+e.message))
+      .finally(()=>{const b=$('wizUsbPrep');if(b)b.disabled=false});
   });
   on('wizReadPc',async()=>{
     try{const txt=await(await hFetch('api/export',{cache:'no-store'})).text();importProfileText(txt,'този комп');renderWizard();}
@@ -2191,9 +2995,11 @@ function bindWizStep(){
     if(!WIZ.usbLetter){toast('Избери флашка в етап 1.');return}
     const url=$('drvUrl')?$('drvUrl').value.trim():'';if(!/^https:\/\//.test(url)){toast('Постави директния https URL на пакета.');return}
     setWizStatus('Стартирам свалянето на пакета — виж PowerShell прозореца…');
+    const b2=$('wizDrvDl');if(b2){b2.disabled=true}
     hFetch('api/drivers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:url,driveLetter:WIZ.usbLetter})})
       .then(r=>r.json()).then(j=>setWizStatus(j.error?('Грешка: '+j.error):(j.note||'Свалянето стартира.')))
-      .catch(e=>setWizStatus('Helper грешка: '+e.message));
+      .catch(e=>setWizStatus('Helper грешка: '+e.message))
+      .finally(()=>{const b=$('wizDrvDl');if(b)b.disabled=false});
   });
   on('wizFinal',()=>wizUpload(true));
   document.querySelectorAll('#wizBody [data-role]').forEach(b=>b.onclick=()=>{applyRolePreset(b.dataset.role);renderWizard()});
@@ -2208,6 +3014,22 @@ function wizUpload(final){
       if(j.error){setWizStatus('Грешка: '+j.error);return}
       WIZ.xmlUploaded=true;setWizStatus((final?'🎉 ФИНАЛНО качено (с приложенията): ':'Качено на флашката: ')+j.path);
     }).catch(e=>setWizStatus('Helper грешка: '+e.message));
+}
+
+
+/* ---------- 📋 Програми на този комп (панел след скана) ---------- */
+function showProgramsPanel(){
+  const pr=(lastProfile&&lastProfile.programs)||[];
+  const ma=(lastProfile&&lastProfile.matchedApps)||[];
+  if(!pr.length){toast('Пусни първо скан (Прочети този комп).');return}
+  const items=pr.map(n=>{
+    const hit=ma.some(id=>{const it=(APPCATALOG.reduce((a,c)=>a.concat(c.items),[]).find(x=>x.id===id)||{});return it&&n.toLowerCase().indexOf((it.n||'').toLowerCase())>-1});
+    return `<div class="appitem"><span class="dot" style="background:${hit?'var(--green)':'var(--mut)'}"></span><span class="lbl" style="font-weight:400">${esc(n)}</span>${hit?'<span class="pill p-green">каталог ✓</span>':''}</div>`;
+  }).join('');
+  openModal(`<h3>📋 Инсталирани програми на този комп (${pr.length})</h3>
+  <p class="hint">${U('scanMatched','От скана: {count} приложения от каталога вече са на компа — отбелязани.').replace('{count}',ma.length)} — вече маркирани в група „Приложения“.</p>
+  <div style="max-height:50vh;overflow:auto">${items}</div>
+  <div class="mfoot"><button class="mbtn sec" onclick="document.getElementById('modal').classList.remove('open')">Затвори</button></div>`);
 }
 
 /* ---------- модали ---------- */
@@ -2413,6 +3235,7 @@ function initTheme(){
 /* ---------- init ---------- */
 function init(){
   initTheme();
+  try{const l=localStorage.getItem('wss-lang');if(l==='en'){LANG='en';$('btnLang').textContent='🌐 BG'}}catch(e){}
   try{const m=localStorage.getItem('wss-mode');if(m==='post'){MODE='post';$('mPost').classList.add('on');$('mPre').classList.remove('on');$('topGen').style.display='none'}}catch(e){}
   probeHelper();
   loadState();
@@ -2427,6 +3250,7 @@ function init(){
   $('btnIso').onclick=modalIso;
   $('btnUsb').onclick=modalUsb;
   $('btnHelp').onclick=()=>{document.querySelector('#rtabs button[data-tab=help]').click()};
+  $('btnLang').onclick=()=>setLang(LANG==='bg'?'en':'bg');
   $('bannerMore').onclick=modalHelp;
   $('btnSaveProf').onclick=saveProfile;
   $('btnTheme').onclick=()=>{
@@ -2436,7 +3260,7 @@ function init(){
     try{localStorage.setItem('wss-theme',nxt)}catch(e){}
     $('btnTheme').textContent=(nxt==='dark'?'☀️':'🌙');
   };
-  $('btnReset').onclick=()=>{if(confirm('Връщане на ВСИЧКИ настройки по подразбиране?')){S_st=Object.assign({},defaults);S_st.accounts=makeDefaultAccounts();S_st.appsMap={};S_st.__keyManual=false;saveState();renderContent();updatePreview();updateSummary();toast('Настройките са нулирани.')}};
+  $('btnReset').onclick=()=>{if(confirm(U('resetConfirm','Връщане на ВСИЧКИ настройки по подразбиране?'))){S_st=Object.assign({},defaults);S_st.accounts=makeDefaultAccounts();S_st.appsMap={};S_st.__keyManual=false;saveState();renderContent();updatePreview();updateSummary();toast(U('resetToast','Настройките са нулирани.'))}};
   document.querySelectorAll('#rtabs button').forEach(b=>{
     b.onclick=()=>{
       document.querySelectorAll('#rtabs button').forEach(x=>x.classList.remove('on'));
